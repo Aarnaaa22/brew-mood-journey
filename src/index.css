@@ -1,95 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 30 25% 96%;
+    --foreground: 25 30% 14%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 33 30% 92%;
+    --card-foreground: 25 30% 14%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 33 30% 92%;
+    --popover-foreground: 25 30% 14%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 25 50% 28%;
+    --primary-foreground: 35 40% 95%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 33 35% 82%;
+    --secondary-foreground: 25 40% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 30 20% 88%;
+    --muted-foreground: 25 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 28 60% 45%;
+    --accent-foreground: 35 40% 95%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 30 20% 82%;
+    --input: 30 20% 82%;
+    --ring: 25 50% 28%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
+
+    /* Coffee-specific tokens */
+    --coffee-dark: 20 40% 18%;
+    --coffee-medium: 25 45% 30%;
+    --coffee-light: 30 35% 55%;
+    --coffee-cream: 35 50% 88%;
+    --coffee-foam: 40 30% 94%;
+    --coffee-caramel: 30 60% 50%;
+    --coffee-steam: 30 10% 80%;
+
+    --shadow-warm: 0 8px 32px -8px hsl(25 50% 28% / 0.15);
+    --shadow-soft: 0 4px 16px -4px hsl(25 50% 28% / 0.1);
+    --shadow-glow: 0 0 40px hsl(30 60% 50% / 0.15);
+
+    --font-display: 'Playfair Display', serif;
+    --font-handwritten: 'Caveat', cursive;
+    --font-body: 'Lora', serif;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -101,5 +71,74 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .font-handwritten {
+    font-family: var(--font-handwritten);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .shadow-warm {
+    box-shadow: var(--shadow-warm);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+}
+
+@keyframes steam {
+  0% { transform: translateY(0) scaleX(1); opacity: 0.4; }
+  50% { transform: translateY(-20px) scaleX(1.2); opacity: 0.2; }
+  100% { transform: translateY(-40px) scaleX(0.8); opacity: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pour {
+  0% { height: 0%; }
+  100% { height: var(--pour-height, 60%); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-steam {
+  animation: steam 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pour {
+  animation: pour 1.5s ease-out forwards;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
 }
