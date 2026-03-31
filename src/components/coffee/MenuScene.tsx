@@ -13,13 +13,11 @@ export interface CoffeeType {
 }
 
 const menuItems: CoffeeType[] = [
-  // Coffee
   { id: "espresso", name: "Espresso", description: "Bold & intense", emoji: "☕", ingredients: ["Espresso"], category: "coffee" },
   { id: "cappuccino", name: "Cappuccino", description: "Creamy & balanced", emoji: "🤎", ingredients: ["Espresso", "Steamed Milk", "Foam"], category: "coffee" },
   { id: "latte", name: "Latte", description: "Smooth & milky", emoji: "🥛", ingredients: ["Espresso", "Steamed Milk", "Light Foam"], category: "coffee" },
   { id: "mocha", name: "Mocha", description: "Chocolate bliss", emoji: "🍫", ingredients: ["Espresso", "Chocolate", "Steamed Milk", "Whipped Cream"], category: "coffee" },
   { id: "americano", name: "Americano", description: "Classic & clean", emoji: "💧", ingredients: ["Espresso", "Hot Water"], category: "coffee" },
-  // Snacks
   { id: "croissant", name: "Croissant", description: "Flaky & buttery", emoji: "🥐", ingredients: ["Butter", "Flour", "Love"], category: "snack" },
   { id: "muffin", name: "Muffin", description: "Warm & fluffy", emoji: "🧁", ingredients: ["Blueberry", "Batter"], category: "snack" },
   { id: "chocolate-cake", name: "Chocolate Cake", description: "Rich & decadent", emoji: "🍰", ingredients: ["Chocolate", "Cream", "Joy"], category: "snack" },
@@ -28,10 +26,13 @@ const menuItems: CoffeeType[] = [
 ];
 
 interface MenuSceneProps {
-  onSelect: (item: CoffeeType) => void;
+  userName: string;
+  onSelectCoffee: (item: CoffeeType) => void;
+  onSelectSnack: (item: CoffeeType) => void;
+  selectedSnack: CoffeeType | null;
 }
 
-const MenuScene = ({ onSelect }: MenuSceneProps) => {
+const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: MenuSceneProps) => {
   const [tab, setTab] = useState<"coffee" | "snack">("coffee");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -44,15 +45,22 @@ const MenuScene = ({ onSelect }: MenuSceneProps) => {
     setMousePos({ x, y });
   };
 
+  const handleItemClick = (item: CoffeeType) => {
+    if (item.category === "coffee") {
+      onSelectCoffee(item);
+    } else {
+      onSelectSnack(item);
+    }
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0">
         <img src={cafeInterior} alt="Café interior" className="w-full h-full object-cover opacity-30" loading="lazy" width={1280} height={800} />
         <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
       </div>
 
-      {/* Blurred NPC silhouettes */}
+      {/* NPC silhouettes */}
       {[20, 75].map((pos, i) => (
         <motion.div
           key={i}
@@ -69,7 +77,31 @@ const MenuScene = ({ onSelect }: MenuSceneProps) => {
       ))}
 
       <div className="relative z-10 w-full max-w-lg mx-auto px-6 py-16">
-        {/* 3D tilt menu card */}
+        {/* Welcome message */}
+        <motion.p
+          className="font-handwritten text-2xl text-center text-muted-foreground mb-4"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          Welcome, {userName}! ✨
+        </motion.p>
+
+        {/* Selected snack indicator */}
+        {selectedSnack && (
+          <motion.div
+            className="flex justify-center mb-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="glass-panel rounded-full px-4 py-2 flex items-center gap-2">
+              <span>{selectedSnack.emoji}</span>
+              <span className="font-handwritten text-foreground">{selectedSnack.name} added!</span>
+              <span className="text-accent">✓</span>
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
           className="glass-panel rounded-3xl p-8 md:p-10 shadow-warm"
           style={{
@@ -97,7 +129,6 @@ const MenuScene = ({ onSelect }: MenuSceneProps) => {
             transition={{ delay: 0.5, duration: 0.6 }}
           />
 
-          {/* Tab switcher */}
           <div className="flex justify-center gap-2 mb-6">
             {(["coffee", "snack"] as const).map((t) => (
               <motion.button
@@ -120,8 +151,12 @@ const MenuScene = ({ onSelect }: MenuSceneProps) => {
             {filtered.map((item, i) => (
               <motion.button
                 key={item.id}
-                onClick={() => onSelect(item)}
-                className="group w-full text-left p-4 rounded-2xl bg-secondary/40 hover:bg-secondary/70 transition-all duration-300 cursor-pointer border border-transparent hover:border-accent/30"
+                onClick={() => handleItemClick(item)}
+                className={`group w-full text-left p-4 rounded-2xl transition-all duration-300 cursor-pointer border ${
+                  selectedSnack?.id === item.id
+                    ? "bg-accent/20 border-accent/40"
+                    : "bg-secondary/40 hover:bg-secondary/70 border-transparent hover:border-accent/30"
+                }`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + i * 0.08 }}
@@ -147,12 +182,23 @@ const MenuScene = ({ onSelect }: MenuSceneProps) => {
                     className="text-accent opacity-0 group-hover:opacity-100 font-handwritten text-lg"
                     initial={false}
                   >
-                    select →
+                    {item.category === "coffee" ? "brew →" : "add ✓"}
                   </motion.span>
                 </div>
               </motion.button>
             ))}
           </div>
+
+          {/* Prompt to select coffee if snack tab is active and snack selected */}
+          {tab === "snack" && selectedSnack && (
+            <motion.p
+              className="font-handwritten text-center text-accent mt-4 text-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              Now pick a coffee from the ☕ tab!
+            </motion.p>
+          )}
         </motion.div>
       </div>
     </div>
