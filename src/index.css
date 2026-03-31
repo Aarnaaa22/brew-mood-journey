@@ -45,6 +45,18 @@
     --coffee-caramel: 30 60% 50%;
     --coffee-steam: 30 10% 80%;
 
+    /* Rainy / ambient tokens */
+    --rain-blue: 210 30% 60%;
+    --rain-grey: 210 10% 45%;
+    --glass-bg: 30 20% 96% / 0.25;
+    --glass-border: 30 20% 96% / 0.18;
+    --glass-blur: 16px;
+
+    /* Ambient overlays */
+    --ambient-morning: 40 70% 55% / 0.08;
+    --ambient-evening: 25 80% 45% / 0.12;
+    --ambient-night: 220 40% 25% / 0.2;
+
     --shadow-warm: 0 8px 32px -8px hsl(25 50% 28% / 0.15);
     --shadow-soft: 0 4px 16px -4px hsl(25 50% 28% / 0.1);
     --shadow-glow: 0 0 40px hsl(30 60% 50% / 0.15);
@@ -62,6 +74,30 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* Night mode overrides */
+  .night-mode {
+    --background: 220 25% 12%;
+    --foreground: 35 30% 88%;
+    --card: 220 20% 16%;
+    --card-foreground: 35 30% 88%;
+    --popover: 220 20% 16%;
+    --popover-foreground: 35 30% 88%;
+    --primary: 30 45% 40%;
+    --primary-foreground: 220 20% 10%;
+    --secondary: 220 15% 22%;
+    --secondary-foreground: 35 30% 80%;
+    --muted: 220 12% 20%;
+    --muted-foreground: 30 10% 55%;
+    --accent: 28 55% 50%;
+    --accent-foreground: 220 20% 10%;
+    --border: 220 12% 25%;
+    --input: 220 12% 25%;
+    --coffee-dark: 20 35% 12%;
+    --coffee-medium: 25 40% 22%;
+    --coffee-cream: 35 25% 75%;
+    --coffee-foam: 40 15% 80%;
+  }
 }
 
 @layer base {
@@ -72,6 +108,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    transition: background-color 0.8s ease, color 0.8s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -103,6 +140,24 @@
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
+
+  .glass-panel {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--glass-border));
+  }
+}
+
+/* Rain animation */
+@keyframes rain-fall {
+  0% { transform: translateY(-100vh) translateX(0); opacity: 0.7; }
+  100% { transform: translateY(100vh) translateX(-20px); opacity: 0.2; }
+}
+
+@keyframes rain-drop-hit {
+  0% { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
 }
 
 @keyframes steam {
@@ -126,6 +181,31 @@
   100% { background-position: 200% 0; }
 }
 
+@keyframes car-pass {
+  0% { transform: translateX(-120px); }
+  100% { transform: translateX(calc(100vw + 120px)); }
+}
+
+@keyframes person-walk {
+  0% { transform: translateX(-40px); }
+  100% { transform: translateX(calc(100vw + 40px)); }
+}
+
+@keyframes streetlight-flicker {
+  0%, 90%, 100% { opacity: 0.8; }
+  95% { opacity: 0.4; }
+}
+
+@keyframes liquid-fill {
+  0% { transform: scaleY(0); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes droplet-slide {
+  0% { transform: translateY(0) scale(1); opacity: 0.6; }
+  100% { transform: translateY(200px) scale(0.5); opacity: 0; }
+}
+
 .animate-steam {
   animation: steam 3s ease-in-out infinite;
 }
@@ -141,4 +221,22 @@
 .animate-shimmer {
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Custom slider styling */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: hsl(var(--accent));
+  border: 3px solid hsl(var(--coffee-cream));
+  cursor: pointer;
+  box-shadow: 0 0 10px hsl(var(--accent) / 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 20px hsl(var(--accent) / 0.5);
 }

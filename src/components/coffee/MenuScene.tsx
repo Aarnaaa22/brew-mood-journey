@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import cafeInterior from "@/assets/cafe-interior.jpg";
 import SteamAnimation from "./SteamAnimation";
@@ -8,40 +9,75 @@ export interface CoffeeType {
   description: string;
   emoji: string;
   ingredients: string[];
+  category: "coffee" | "snack";
 }
 
-const coffeeOptions: CoffeeType[] = [
-  { id: "espresso", name: "Espresso", description: "Bold & intense", emoji: "☕", ingredients: ["Espresso"] },
-  { id: "cappuccino", name: "Cappuccino", description: "Creamy & balanced", emoji: "🤎", ingredients: ["Espresso", "Steamed Milk", "Foam"] },
-  { id: "latte", name: "Latte", description: "Smooth & milky", emoji: "🥛", ingredients: ["Espresso", "Steamed Milk", "Light Foam"] },
-  { id: "mocha", name: "Mocha", description: "Chocolate bliss", emoji: "🍫", ingredients: ["Espresso", "Chocolate", "Steamed Milk", "Whipped Cream"] },
-  { id: "americano", name: "Americano", description: "Classic & clean", emoji: "💧", ingredients: ["Espresso", "Hot Water"] },
+const menuItems: CoffeeType[] = [
+  // Coffee
+  { id: "espresso", name: "Espresso", description: "Bold & intense", emoji: "☕", ingredients: ["Espresso"], category: "coffee" },
+  { id: "cappuccino", name: "Cappuccino", description: "Creamy & balanced", emoji: "🤎", ingredients: ["Espresso", "Steamed Milk", "Foam"], category: "coffee" },
+  { id: "latte", name: "Latte", description: "Smooth & milky", emoji: "🥛", ingredients: ["Espresso", "Steamed Milk", "Light Foam"], category: "coffee" },
+  { id: "mocha", name: "Mocha", description: "Chocolate bliss", emoji: "🍫", ingredients: ["Espresso", "Chocolate", "Steamed Milk", "Whipped Cream"], category: "coffee" },
+  { id: "americano", name: "Americano", description: "Classic & clean", emoji: "💧", ingredients: ["Espresso", "Hot Water"], category: "coffee" },
+  // Snacks
+  { id: "croissant", name: "Croissant", description: "Flaky & buttery", emoji: "🥐", ingredients: ["Butter", "Flour", "Love"], category: "snack" },
+  { id: "muffin", name: "Muffin", description: "Warm & fluffy", emoji: "🧁", ingredients: ["Blueberry", "Batter"], category: "snack" },
+  { id: "chocolate-cake", name: "Chocolate Cake", description: "Rich & decadent", emoji: "🍰", ingredients: ["Chocolate", "Cream", "Joy"], category: "snack" },
+  { id: "cookies", name: "Cookies", description: "Crispy & sweet", emoji: "🍪", ingredients: ["Butter", "Chocolate Chips"], category: "snack" },
+  { id: "sandwich", name: "Sandwich", description: "Hearty & fresh", emoji: "🥪", ingredients: ["Bread", "Cheese", "Greens"], category: "snack" },
 ];
 
 interface MenuSceneProps {
-  onSelect: (coffee: CoffeeType) => void;
+  onSelect: (item: CoffeeType) => void;
 }
 
 const MenuScene = ({ onSelect }: MenuSceneProps) => {
+  const [tab, setTab] = useState<"coffee" | "snack">("coffee");
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const filtered = menuItems.filter((m) => m.category === tab);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -8;
+    setMousePos({ x, y });
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
-        <img
-          src={cafeInterior}
-          alt="Café interior"
-          className="w-full h-full object-cover opacity-40"
-          loading="lazy"
-          width={1280}
-          height={800}
-        />
-        <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+        <img src={cafeInterior} alt="Café interior" className="w-full h-full object-cover opacity-30" loading="lazy" width={1280} height={800} />
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
       </div>
 
-      <div className="relative z-10 w-full max-w-lg mx-auto px-6 py-16">
-        {/* Menu card */}
+      {/* Blurred NPC silhouettes */}
+      {[20, 75].map((pos, i) => (
         <motion.div
-          className="bg-card/90 backdrop-blur-md rounded-3xl p-8 md:p-10 shadow-warm border border-border/50"
+          key={i}
+          className="absolute bottom-[15%] opacity-10 blur-[2px]"
+          style={{ left: `${pos}%` }}
+          animate={{ y: [0, -4, 0], x: [0, i % 2 === 0 ? 3 : -3, 0] }}
+          transition={{ duration: 5 + i * 2, repeat: Infinity }}
+        >
+          <div className="flex flex-col items-center">
+            <div className="w-6 h-6 rounded-full bg-foreground" />
+            <div className="w-4 h-12 bg-foreground rounded-b-lg mt-1" />
+          </div>
+        </motion.div>
+      ))}
+
+      <div className="relative z-10 w-full max-w-lg mx-auto px-6 py-16">
+        {/* 3D tilt menu card */}
+        <motion.div
+          className="glass-panel rounded-3xl p-8 md:p-10 shadow-warm"
+          style={{
+            transform: `perspective(800px) rotateY(${mousePos.x}deg) rotateX(${mousePos.y}deg)`,
+            transition: "transform 0.15s ease-out",
+          }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setMousePos({ x: 0, y: 0 })}
           initial={{ opacity: 0, y: 40, rotateX: 10 }}
           animate={{ opacity: 1, y: 0, rotateX: 0 }}
           transition={{ duration: 0.8 }}
@@ -55,35 +91,56 @@ const MenuScene = ({ onSelect }: MenuSceneProps) => {
             Our Menu
           </motion.h2>
           <motion.div
-            className="w-16 h-0.5 bg-accent mx-auto mb-8 rounded-full"
+            className="w-16 h-0.5 bg-accent mx-auto mb-6 rounded-full"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           />
 
-          <div className="space-y-3">
-            {coffeeOptions.map((coffee, i) => (
+          {/* Tab switcher */}
+          <div className="flex justify-center gap-2 mb-6">
+            {(["coffee", "snack"] as const).map((t) => (
               <motion.button
-                key={coffee.id}
-                onClick={() => onSelect(coffee)}
-                className="group w-full text-left p-4 rounded-2xl bg-secondary/50 hover:bg-secondary transition-all duration-300 cursor-pointer border border-transparent hover:border-accent/30"
+                key={t}
+                onClick={() => setTab(t)}
+                className={`px-5 py-2 rounded-full font-handwritten text-lg cursor-pointer transition-all duration-300 ${
+                  tab === t
+                    ? "bg-accent text-accent-foreground"
+                    : "bg-secondary/50 text-secondary-foreground hover:bg-secondary"
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {t === "coffee" ? "☕ Coffee" : "🥐 Snacks"}
+              </motion.button>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            {filtered.map((item, i) => (
+              <motion.button
+                key={item.id}
+                onClick={() => onSelect(item)}
+                className="group w-full text-left p-4 rounded-2xl bg-secondary/40 hover:bg-secondary/70 transition-all duration-300 cursor-pointer border border-transparent hover:border-accent/30"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-                whileHover={{ x: 6 }}
+                transition={{ delay: 0.3 + i * 0.08 }}
+                whileHover={{ x: 6, boxShadow: "0 0 20px hsl(var(--accent) / 0.15)" }}
                 whileTap={{ scale: 0.98 }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl relative">
-                      {coffee.emoji}
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        <SteamAnimation count={2} />
-                      </div>
+                      {item.emoji}
+                      {item.category === "coffee" && (
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                          <SteamAnimation count={2} />
+                        </div>
+                      )}
                     </span>
                     <div>
-                      <span className="font-display text-lg text-foreground block">{coffee.name}</span>
-                      <span className="font-handwritten text-muted-foreground text-sm">{coffee.description}</span>
+                      <span className="font-display text-lg text-foreground block">{item.name}</span>
+                      <span className="font-handwritten text-muted-foreground text-sm">{item.description}</span>
                     </div>
                   </div>
                   <motion.span
@@ -103,5 +160,4 @@ const MenuScene = ({ onSelect }: MenuSceneProps) => {
 };
 
 export default MenuScene;
-export { coffeeOptions };
-export type { CoffeeType as CoffeeTypeExport };
+export { menuItems };

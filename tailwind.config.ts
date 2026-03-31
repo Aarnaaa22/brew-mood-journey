@@ -56,6 +56,10 @@ export default {
           caramel: "hsl(var(--coffee-caramel))",
           steam: "hsl(var(--coffee-steam))",
         },
+        rain: {
+          blue: "hsl(var(--rain-blue))",
+          grey: "hsl(var(--rain-grey))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

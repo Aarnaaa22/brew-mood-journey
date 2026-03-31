@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import cafeExterior from "@/assets/cafe-exterior.jpg";
 
 interface EntrySceneProps {
@@ -6,26 +7,64 @@ interface EntrySceneProps {
 }
 
 const EntryScene = ({ onEnter }: EntrySceneProps) => {
+  const [doorOpen, setDoorOpen] = useState(false);
+
+  const handleEnter = () => {
+    setDoorOpen(true);
+    setTimeout(onEnter, 1200);
+  };
+
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-coffee-dark">
-      {/* Background image */}
-      <div className="absolute inset-0">
+      {/* Background image with parallax feel */}
+      <motion.div
+        className="absolute inset-0"
+        animate={doorOpen ? { scale: 1.15, opacity: 0 } : { scale: 1, opacity: 1 }}
+        transition={{ duration: 1.2, ease: "easeInOut" }}
+      >
         <img
           src={cafeExterior}
-          alt="Cozy café exterior"
+          alt="Cozy café exterior in rain"
           className="w-full h-full object-cover opacity-80"
           width={1280}
           height={800}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-coffee-dark/80 via-coffee-dark/30 to-transparent" />
-      </div>
+      </motion.div>
+
+      {/* Door opening overlay */}
+      <AnimatePresence>
+        {doorOpen && (
+          <motion.div
+            className="absolute inset-0 z-20 flex"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Left door */}
+            <motion.div
+              className="w-1/2 h-full bg-coffee-dark"
+              initial={{ x: 0 }}
+              animate={{ x: "-100%" }}
+              transition={{ duration: 1, ease: [0.65, 0, 0.35, 1] }}
+            />
+            {/* Right door */}
+            <motion.div
+              className="w-1/2 h-full bg-coffee-dark"
+              initial={{ x: 0 }}
+              animate={{ x: "100%" }}
+              transition={{ duration: 1, ease: [0.65, 0, 0.35, 1] }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Content */}
       <motion.div
         className="relative z-10 text-center"
         initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
+        animate={doorOpen ? { opacity: 0, y: -30 } : { opacity: 1, y: 0 }}
+        transition={{ duration: doorOpen ? 0.5 : 1.2, ease: "easeOut" }}
       >
         <motion.h1
           className="font-display text-6xl md:text-8xl text-coffee-cream mb-4 tracking-wide"
@@ -41,11 +80,11 @@ const EntryScene = ({ onEnter }: EntrySceneProps) => {
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.8 }}
         >
-          A little journey for your soul ☕
+          A rainy day journey for your soul 🌧️☕
         </motion.p>
 
         <motion.button
-          onClick={onEnter}
+          onClick={handleEnter}
           className="group relative px-10 py-4 rounded-full bg-coffee-caramel/90 text-coffee-cream font-handwritten text-2xl shadow-glow backdrop-blur-sm border border-coffee-cream/20 cursor-pointer"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -54,31 +93,28 @@ const EntryScene = ({ onEnter }: EntrySceneProps) => {
           whileTap={{ scale: 0.97 }}
         >
           <span className="relative z-10">Enter the Café</span>
-          <motion.div
-            className="absolute inset-0 rounded-full bg-coffee-caramel"
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 0.2 }}
-          />
         </motion.button>
       </motion.div>
 
-      {/* Floating particles */}
-      {[...Array(6)].map((_, i) => (
+      {/* Floating rain-like particles */}
+      {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-coffee-cream/20"
+          className="absolute w-0.5 rounded-full bg-rain-blue/30"
           style={{
-            left: `${15 + i * 15}%`,
-            bottom: "10%",
+            left: `${10 + i * 12}%`,
+            height: 15 + Math.random() * 20,
+            top: "-5%",
           }}
           animate={{
-            y: [-20, -80, -20],
-            opacity: [0, 0.6, 0],
+            y: [0, window.innerHeight + 100],
+            opacity: [0.4, 0],
           }}
           transition={{
-            duration: 4 + i,
+            duration: 2 + Math.random() * 2,
             repeat: Infinity,
-            delay: i * 0.8,
+            delay: i * 0.4,
+            ease: "linear",
           }}
         />
       ))}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { CoffeeType } from "./MenuScene";
 
@@ -42,21 +42,29 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
   const steps = getSteps(coffee);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [dragging, setDragging] = useState<string | null>(null);
 
-  const handleStep = () => {
+  const progress = (completedSteps.length / steps.length) * 100;
+  const step = steps[currentStep];
+
+  const handleStep = useCallback(() => {
     setCompletedSteps((prev) => [...prev, currentStep]);
     if (currentStep < steps.length - 1) {
       setTimeout(() => setCurrentStep(currentStep + 1), 600);
     } else {
       setTimeout(onComplete, 800);
     }
-  };
+  }, [currentStep, steps.length, onComplete]);
 
-  const step = steps[currentStep];
-  const progress = ((completedSteps.length) / steps.length) * 100;
+  const handleDrop = useCallback(() => {
+    if (dragging) {
+      setDragging(null);
+      handleStep();
+    }
+  }, [dragging, handleStep]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+    <div className="min-h-screen flex items-center justify-center px-6 relative z-10">
       <motion.div
         className="w-full max-w-lg"
         initial={{ opacity: 0 }}
@@ -67,11 +75,11 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           Brewing Your {coffee.name}
         </h2>
         <p className="font-handwritten text-xl text-center text-muted-foreground mb-8">
-          Tap each step to craft your coffee
+          Drag ingredients or tap to craft
         </p>
 
         {/* Progress bar */}
-        <div className="w-full h-2 bg-secondary rounded-full mb-10 overflow-hidden">
+        <div className="w-full h-2 bg-secondary rounded-full mb-4 overflow-hidden">
           <motion.div
             className="h-full bg-accent rounded-full"
             initial={{ width: 0 }}
@@ -79,12 +87,50 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
             transition={{ duration: 0.5 }}
           />
         </div>
+        <p className="text-center font-handwritten text-muted-foreground mb-6">
+          Brewing… {Math.round(progress)}%
+        </p>
 
-        {/* Coffee station visualization */}
-        <div className="bg-card/80 backdrop-blur rounded-3xl p-8 shadow-warm border border-border/50 mb-6">
-          {/* Cup with layers building up */}
+        <div className="glass-panel rounded-3xl p-8 shadow-warm mb-6">
+          {/* Coffee station */}
+          <div className="flex justify-between items-end mb-6 px-4">
+            {/* Coffee machine */}
+            <motion.div
+              className="flex flex-col items-center"
+              animate={completedSteps.length > 0 ? { y: [0, -2, 0] } : {}}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="w-16 h-20 bg-secondary rounded-lg border border-border relative">
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-accent" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-2 bg-coffee-medium rounded-b" />
+              </div>
+              <span className="font-handwritten text-xs text-muted-foreground mt-1">Machine</span>
+            </motion.div>
+
+            {/* Milk jug */}
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-14 bg-coffee-cream rounded-b-xl rounded-t-lg border border-border relative">
+                <div className="absolute -right-2 top-1 w-3 h-5 border-2 border-border rounded-r-full" />
+              </div>
+              <span className="font-handwritten text-xs text-muted-foreground mt-1">Milk</span>
+            </div>
+
+            {/* Beans */}
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-10 bg-coffee-medium/30 rounded-xl border border-border flex items-center justify-center text-lg">
+                🫘
+              </div>
+              <span className="font-handwritten text-xs text-muted-foreground mt-1">Beans</span>
+            </div>
+          </div>
+
+          {/* Cup with layers */}
           <div className="flex justify-center mb-8">
-            <div className="relative w-40 h-48">
+            <div
+              className="relative w-40 h-48"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
+            >
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-36 h-44 rounded-b-3xl rounded-t-lg border-2 border-coffee-medium/30 bg-coffee-foam/20 overflow-hidden">
                 {completedSteps.map((stepIdx, i) => {
                   const layerColors: Record<string, string> = {
@@ -113,8 +159,21 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                     />
                   );
                 })}
+                {/* Steam particles */}
+                {completedSteps.length > 0 && (
+                  <>
+                    {[...Array(3)].map((_, i) => (
+                      <motion.div
+                        key={`steam-${i}`}
+                        className="absolute w-1 bg-coffee-steam/30 rounded-full"
+                        style={{ left: `${25 + i * 25}%`, top: -15, height: 12 }}
+                        animate={{ y: [-5, -25], opacity: [0.3, 0], scaleX: [1, 1.5] }}
+                        transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                      />
+                    ))}
+                  </>
+                )}
               </div>
-              {/* Handle */}
               <div className="absolute right-[-14px] top-1/3 w-5 h-12 border-2 border-coffee-medium/30 rounded-r-full" />
             </div>
           </div>
@@ -146,19 +205,21 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           </AnimatePresence>
         </div>
 
-        {/* Step buttons */}
+        {/* Draggable ingredient + step pills */}
         <div className="flex gap-2 justify-center flex-wrap mb-6">
           {steps.map((s, i) => (
             <motion.div
               key={i}
+              draggable={i === currentStep && !completedSteps.includes(i)}
+              onDragStart={() => setDragging(s.label)}
               className={`px-3 py-1.5 rounded-full text-sm font-handwritten transition-all duration-300 ${
                 completedSteps.includes(i)
                   ? "bg-accent text-accent-foreground"
                   : i === currentStep
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground cursor-grab active:cursor-grabbing"
                   : "bg-secondary text-secondary-foreground"
               }`}
-              animate={i === currentStep ? { scale: [1, 1.05, 1] } : {}}
+              animate={i === currentStep && !completedSteps.includes(i) ? { scale: [1, 1.05, 1] } : {}}
               transition={{ duration: 2, repeat: Infinity }}
             >
               {s.icon} {s.label}
