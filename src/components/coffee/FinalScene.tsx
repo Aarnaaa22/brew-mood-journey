@@ -10,10 +10,10 @@ interface FinalSceneProps {
 
 const FinalScene = ({ coffee, quantity, onRestart }: FinalSceneProps) => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6 overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-6 overflow-hidden relative z-10">
       {/* Ambient glow */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-accent/5 blur-3xl" />
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-accent/8 blur-3xl" />
       </div>
 
       <motion.div
@@ -22,40 +22,41 @@ const FinalScene = ({ coffee, quantity, onRestart }: FinalSceneProps) => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        {/* Coffee image */}
+        {/* Coffee image with glow */}
         <motion.div
           className="relative mx-auto w-64 h-64 mb-8"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
         >
+          <div className="absolute inset-0 rounded-full bg-accent/10 blur-2xl" />
           <img
             src={coffeeCupImg}
             alt={`Your ${coffee.name}`}
-            className="w-full h-full object-cover rounded-full shadow-glow"
+            className="w-full h-full object-cover rounded-full shadow-glow relative z-10"
             loading="lazy"
             width={800}
             height={800}
           />
-          {/* Steam wisps */}
-          {[...Array(4)].map((_, i) => (
+          {/* Continuous steam */}
+          {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 bg-coffee-steam/30 rounded-full"
+              className="absolute w-1 bg-coffee-steam/30 rounded-full z-20"
               style={{
                 height: 15 + i * 5,
-                left: `${30 + i * 12}%`,
+                left: `${25 + i * 12}%`,
                 top: -10,
               }}
               animate={{
-                y: [-5, -35, -55],
+                y: [-5, -40, -60],
                 opacity: [0.3, 0.15, 0],
                 scaleX: [1, 1.5, 0.5],
               }}
               transition={{
                 duration: 3 + i * 0.5,
                 repeat: Infinity,
-                delay: i * 0.6,
+                delay: i * 0.5,
                 ease: "easeOut",
               }}
             />

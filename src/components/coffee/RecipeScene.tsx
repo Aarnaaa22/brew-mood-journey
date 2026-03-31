@@ -10,7 +10,7 @@ const RecipeScene = ({ coffee, onContinue }: RecipeSceneProps) => {
   const recipeText = coffee.ingredients.join(" + ");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+    <div className="min-h-screen flex items-center justify-center px-6 relative z-10">
       <motion.div
         className="w-full max-w-md text-center"
         initial={{ opacity: 0, scale: 0.95 }}
@@ -18,7 +18,7 @@ const RecipeScene = ({ coffee, onContinue }: RecipeSceneProps) => {
         transition={{ duration: 0.8 }}
       >
         <motion.div
-          className="bg-card/80 backdrop-blur rounded-3xl p-10 shadow-warm border border-border/50"
+          className="glass-panel rounded-3xl p-10 shadow-warm"
           initial={{ y: 30 }}
           animate={{ y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
@@ -66,7 +66,7 @@ const RecipeScene = ({ coffee, onContinue }: RecipeSceneProps) => {
 
           {/* Formula */}
           <motion.div
-            className="bg-secondary/60 rounded-2xl p-4 mb-8"
+            className="bg-secondary/40 rounded-2xl p-4 mb-8 border border-border/30"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}

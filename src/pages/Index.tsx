@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import EntryScene from "@/components/coffee/EntryScene";
 import MenuScene from "@/components/coffee/MenuScene";
@@ -8,6 +8,9 @@ import RecipeScene from "@/components/coffee/RecipeScene";
 import FinalScene from "@/components/coffee/FinalScene";
 import ProgressIndicator from "@/components/coffee/ProgressIndicator";
 import SceneTransition from "@/components/coffee/SceneTransition";
+import RainEffect from "@/components/coffee/RainEffect";
+import WindowScene from "@/components/coffee/WindowScene";
+import AmbientControls from "@/components/coffee/AmbientControls";
 import type { CoffeeType } from "@/components/coffee/MenuScene";
 
 type Scene = "entry" | "menu" | "selection" | "making" | "recipe" | "final";
@@ -25,6 +28,25 @@ const Index = () => {
   const [scene, setScene] = useState<Scene>("entry");
   const [selectedCoffee, setSelectedCoffee] = useState<CoffeeType | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [rainOn, setRainOn] = useState(true);
+  const [ambiance, setAmbiance] = useState<"morning" | "evening" | "night">("evening");
+  const [soundOn, setSoundOn] = useState(false);
+
+  // Apply night mode class
+  useEffect(() => {
+    if (ambiance === "night") {
+      document.documentElement.classList.add("night-mode");
+    } else {
+      document.documentElement.classList.remove("night-mode");
+    }
+    return () => document.documentElement.classList.remove("night-mode");
+  }, [ambiance]);
+
+  const cycleAmbiance = () => {
+    setAmbiance((prev) =>
+      prev === "morning" ? "evening" : prev === "evening" ? "night" : "morning"
+    );
+  };
 
   const handleCoffeeSelect = (coffee: CoffeeType) => {
     setSelectedCoffee(coffee);
@@ -33,7 +55,11 @@ const Index = () => {
 
   const handleConfirmSelection = (qty: number) => {
     setQuantity(qty);
-    setScene("making");
+    if (selectedCoffee?.category === "coffee") {
+      setScene("making");
+    } else {
+      setScene("recipe");
+    }
   };
 
   const handleRestart = () => {
@@ -43,7 +69,21 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className="min-h-screen overflow-hidden relative">
+      {/* Global environment layers */}
+      <WindowScene ambiance={ambiance} />
+      {rainOn && <RainEffect intensity={50} />}
+
+      {/* Ambient controls */}
+      <AmbientControls
+        rainOn={rainOn}
+        onToggleRain={() => setRainOn(!rainOn)}
+        ambiance={ambiance}
+        onCycleAmbiance={cycleAmbiance}
+        soundOn={soundOn}
+        onToggleSound={() => setSoundOn(!soundOn)}
+      />
+
       {scene !== "entry" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
 
       <AnimatePresence mode="wait">
