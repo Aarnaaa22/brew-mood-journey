@@ -2,21 +2,22 @@ import { motion } from "framer-motion";
 
 const SteamAnimation = ({ count = 3 }: { count?: number }) => {
   return (
-    <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-none">
+    <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
       {Array.from({ length: count }).map((_, i) => (
         <motion.div
           key={i}
-          className="w-1 rounded-full bg-coffee-steam/40"
-          style={{ height: 20 + Math.random() * 10 }}
+          className="w-0.5 rounded-full bg-coffee-steam/35"
+          style={{ height: 16 + i * 4 }}
           animate={{
-            y: [-0, -30, -50],
-            opacity: [0.4, 0.2, 0],
-            scaleX: [1, 1.3, 0.6],
+            y: [-0, -25, -40],
+            opacity: [0.35, 0.15, 0],
+            scaleX: [1, 1.5, 0.4],
+            rotate: [0, i % 2 === 0 ? 15 : -15, 0],
           }}
           transition={{
-            duration: 2.5 + i * 0.3,
+            duration: 2 + i * 0.4,
             repeat: Infinity,
-            delay: i * 0.5,
+            delay: i * 0.4,
             ease: "easeOut",
           }}
         />

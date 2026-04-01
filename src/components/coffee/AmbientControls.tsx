@@ -24,43 +24,40 @@ const AmbientControls = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1.5, duration: 0.6 }}
     >
-      {/* Rain toggle */}
       <motion.button
         onClick={onToggleRain}
-        className="glass-panel w-12 h-12 rounded-2xl flex items-center justify-center text-lg cursor-pointer"
-        whileHover={{ scale: 1.1 }}
+        className="glass-panel w-11 h-11 rounded-xl flex items-center justify-center text-base cursor-pointer border border-border/30"
+        whileHover={{ scale: 1.1, boxShadow: "0 0 15px hsl(var(--accent) / 0.15)" }}
         whileTap={{ scale: 0.9 }}
         title={rainOn ? "Turn off rain" : "Turn on rain"}
       >
         {rainOn ? "🌧️" : "☀️"}
       </motion.button>
 
-      {/* Ambiance cycle */}
       <motion.button
         onClick={onCycleAmbiance}
-        className="glass-panel w-12 h-12 rounded-2xl flex items-center justify-center text-lg cursor-pointer"
-        whileHover={{ scale: 1.1 }}
+        className="glass-panel w-11 h-11 rounded-xl flex items-center justify-center text-base cursor-pointer border border-border/30"
+        whileHover={{ scale: 1.1, boxShadow: "0 0 15px hsl(var(--accent) / 0.15)" }}
         whileTap={{ scale: 0.9 }}
         title={ambianceLabels[ambiance]}
       >
         {ambianceIcons[ambiance]}
       </motion.button>
 
-      {/* Sound indicator */}
       <motion.button
         onClick={onToggleSound}
-        className="glass-panel w-12 h-12 rounded-2xl flex items-center justify-center cursor-pointer"
-        whileHover={{ scale: 1.1 }}
+        className="glass-panel w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-border/30"
+        whileHover={{ scale: 1.1, boxShadow: "0 0 15px hsl(var(--accent) / 0.15)" }}
         whileTap={{ scale: 0.9 }}
         title={soundOn ? "Sound on" : "Sound off"}
       >
         {soundOn ? (
-          <div className="flex items-end gap-0.5 h-5">
+          <div className="flex items-end gap-0.5 h-4">
             {[0.4, 0.7, 1, 0.6].map((h, i) => (
               <motion.div
                 key={i}
-                className="w-1 bg-accent rounded-full"
-                animate={{ height: [`${h * 12}px`, `${h * 20}px`, `${h * 12}px`] }}
+                className="w-0.5 bg-accent rounded-full"
+                animate={{ height: [`${h * 10}px`, `${h * 16}px`, `${h * 10}px`] }}
                 transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
               />
             ))}

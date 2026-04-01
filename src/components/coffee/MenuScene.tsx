@@ -35,13 +35,14 @@ interface MenuSceneProps {
 const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: MenuSceneProps) => {
   const [tab, setTab] = useState<"coffee" | "snack">("coffee");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const filtered = menuItems.filter((m) => m.category === tab);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -8;
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
     setMousePos({ x, y });
   };
 
@@ -56,28 +57,28 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src={cafeInterior} alt="Café interior" className="w-full h-full object-cover opacity-30" loading="lazy" width={1280} height={800} />
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
+        <img src={cafeInterior} alt="Café interior" className="w-full h-full object-cover opacity-25 blur-[2px]" loading="lazy" width={1280} height={800} />
+        <div className="absolute inset-0 bg-background/65 backdrop-blur-sm" />
       </div>
 
-      {/* NPC silhouettes */}
-      {[20, 75].map((pos, i) => (
+      {/* NPC silhouettes with subtle depth */}
+      {[18, 78].map((pos, i) => (
         <motion.div
           key={i}
-          className="absolute bottom-[15%] opacity-10 blur-[2px]"
+          className="absolute bottom-[12%] opacity-[0.06] blur-[3px]"
           style={{ left: `${pos}%` }}
-          animate={{ y: [0, -4, 0], x: [0, i % 2 === 0 ? 3 : -3, 0] }}
-          transition={{ duration: 5 + i * 2, repeat: Infinity }}
+          animate={{ y: [0, -5, 0], x: [0, i % 2 === 0 ? 4 : -4, 0] }}
+          transition={{ duration: 6 + i * 2, repeat: Infinity }}
         >
           <div className="flex flex-col items-center">
-            <div className="w-6 h-6 rounded-full bg-foreground" />
-            <div className="w-4 h-12 bg-foreground rounded-b-lg mt-1" />
+            <div className="w-7 h-7 rounded-full bg-foreground" />
+            <div className="w-5 h-14 bg-foreground rounded-b-lg mt-1" />
           </div>
         </motion.div>
       ))}
 
       <div className="relative z-10 w-full max-w-lg mx-auto px-6 py-16">
-        {/* Welcome message */}
+        {/* Welcome */}
         <motion.p
           className="font-handwritten text-2xl text-center text-muted-foreground mb-4"
           initial={{ opacity: 0, y: -10 }}
@@ -87,7 +88,6 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
           Welcome, {userName}! ✨
         </motion.p>
 
-        {/* Selected snack indicator */}
         {selectedSnack && (
           <motion.div
             className="flex justify-center mb-4"
@@ -102,11 +102,12 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
           </motion.div>
         )}
 
+        {/* 3D tilting menu card */}
         <motion.div
-          className="glass-panel rounded-3xl p-8 md:p-10 shadow-warm"
+          className="glass-panel rounded-3xl p-8 md:p-10 shadow-warm relative overflow-hidden"
           style={{
             transform: `perspective(800px) rotateY(${mousePos.x}deg) rotateX(${mousePos.y}deg)`,
-            transition: "transform 0.15s ease-out",
+            transition: "transform 0.12s ease-out",
           }}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setMousePos({ x: 0, y: 0 })}
@@ -114,8 +115,16 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
           animate={{ opacity: 1, y: 0, rotateX: 0 }}
           transition={{ duration: 0.8 }}
         >
+          {/* Reflection highlight */}
+          <div
+            className="absolute inset-0 pointer-events-none rounded-3xl"
+            style={{
+              background: `radial-gradient(ellipse at ${50 + mousePos.x * 4}% ${50 - mousePos.y * 4}%, hsl(40 50% 90% / 0.08), transparent 50%)`,
+            }}
+          />
+
           <motion.h2
-            className="font-handwritten text-5xl text-center text-foreground mb-2"
+            className="font-handwritten text-5xl text-center text-foreground mb-2 relative z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -136,7 +145,7 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
                 onClick={() => setTab(t)}
                 className={`px-5 py-2 rounded-full font-handwritten text-lg cursor-pointer transition-all duration-300 ${
                   tab === t
-                    ? "bg-accent text-accent-foreground"
+                    ? "bg-accent text-accent-foreground shadow-soft"
                     : "bg-secondary/50 text-secondary-foreground hover:bg-secondary"
                 }`}
                 whileHover={{ scale: 1.05 }}
@@ -152,23 +161,36 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
               <motion.button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
-                className={`group w-full text-left p-4 rounded-2xl transition-all duration-300 cursor-pointer border ${
+                onMouseEnter={() => setHoveredItem(item.id)}
+                onMouseLeave={() => setHoveredItem(null)}
+                className={`group w-full text-left p-4 rounded-2xl transition-all duration-300 cursor-pointer border relative overflow-hidden ${
                   selectedSnack?.id === item.id
                     ? "bg-accent/20 border-accent/40"
-                    : "bg-secondary/40 hover:bg-secondary/70 border-transparent hover:border-accent/30"
+                    : "bg-secondary/30 hover:bg-secondary/60 border-transparent hover:border-accent/30"
                 }`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + i * 0.08 }}
-                whileHover={{ x: 6, boxShadow: "0 0 20px hsl(var(--accent) / 0.15)" }}
+                whileHover={{ x: 6, boxShadow: "0 0 24px hsl(var(--accent) / 0.12)" }}
                 whileTap={{ scale: 0.98 }}
               >
-                <div className="flex items-center justify-between">
+                {/* Hover glow */}
+                {hoveredItem === item.id && (
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{
+                      background: "radial-gradient(ellipse at 20% 50%, hsl(var(--accent) / 0.08), transparent 60%)",
+                    }}
+                  />
+                )}
+                <div className="flex items-center justify-between relative z-10">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl relative">
                       {item.emoji}
-                      {item.category === "coffee" && (
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      {item.category === "coffee" && hoveredItem === item.id && (
+                        <div className="opacity-100 transition-opacity duration-500">
                           <SteamAnimation count={2} />
                         </div>
                       )}
@@ -179,8 +201,7 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
                     </div>
                   </div>
                   <motion.span
-                    className="text-accent opacity-0 group-hover:opacity-100 font-handwritten text-lg"
-                    initial={false}
+                    className="text-accent opacity-0 group-hover:opacity-100 font-handwritten text-lg transition-opacity duration-300"
                   >
                     {item.category === "coffee" ? "brew →" : "add ✓"}
                   </motion.span>
@@ -189,7 +210,6 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
             ))}
           </div>
 
-          {/* Prompt to select coffee if snack tab is active and snack selected */}
           {tab === "snack" && selectedSnack && (
             <motion.p
               className="font-handwritten text-center text-accent mt-4 text-lg"
@@ -201,6 +221,11 @@ const MenuScene = ({ userName, onSelectCoffee, onSelectSnack, selectedSnack }: M
           )}
         </motion.div>
       </div>
+
+      {/* Depth vignette */}
+      <div className="absolute inset-0 pointer-events-none z-20"
+        style={{ background: "radial-gradient(ellipse, transparent 50%, hsl(var(--background) / 0.3) 100%)" }}
+      />
     </div>
   );
 };
