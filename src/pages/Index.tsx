@@ -19,14 +19,7 @@ import type { RoastType } from "@/components/coffee/BeanSelectionScene";
 type Scene = "entry" | "menu" | "selection" | "beans" | "grinding" | "making" | "recipe" | "final";
 
 const sceneIndex: Record<Scene, number> = {
-  entry: 0,
-  menu: 1,
-  selection: 2,
-  beans: 3,
-  grinding: 4,
-  making: 5,
-  recipe: 6,
-  final: 7,
+  entry: 0, menu: 1, selection: 2, beans: 3, grinding: 4, making: 5, recipe: 6, final: 7,
 };
 
 const Index = () => {
@@ -56,53 +49,29 @@ const Index = () => {
     );
   };
 
-  const handleEnter = (name: string) => {
-    setUserName(name);
-    setScene("menu");
-  };
-
-  const handleCoffeeSelect = (coffee: CoffeeType) => {
-    setSelectedCoffee(coffee);
-    setScene("selection");
-  };
-
-  const handleSnackSelect = (snack: CoffeeType) => {
-    setSelectedSnack(snack);
-  };
-
+  const handleEnter = (name: string) => { setUserName(name); setScene("menu"); };
+  const handleCoffeeSelect = (coffee: CoffeeType) => { setSelectedCoffee(coffee); setScene("selection"); };
+  const handleSnackSelect = (snack: CoffeeType) => { setSelectedSnack(snack); };
   const handleConfirmSelection = (qty: number, size: string) => {
-    setQuantity(qty);
-    setCupSize(size);
-    if (selectedCoffee?.category === "coffee") {
-      setScene("beans");
-    } else {
-      setScene("recipe");
-    }
+    setQuantity(qty); setCupSize(size);
+    setScene(selectedCoffee?.category === "coffee" ? "beans" : "recipe");
   };
-
-  const handleBeanSelect = (roast: RoastType) => {
-    setRoastType(roast);
-    setScene("grinding");
-  };
-
+  const handleBeanSelect = (roast: RoastType) => { setRoastType(roast); setScene("grinding"); };
   const handleRestart = () => {
-    setSelectedCoffee(null);
-    setSelectedSnack(null);
-    setQuantity(1);
-    setCupSize("medium");
-    setRoastType("medium");
+    setSelectedCoffee(null); setSelectedSnack(null);
+    setQuantity(1); setCupSize("medium"); setRoastType("medium");
     setScene("menu");
   };
 
   return (
     <div className="min-h-screen overflow-hidden relative">
       {/* Film grain overlay */}
-      <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.03]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+      <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.025]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
       }} />
 
       <WindowScene ambiance={ambiance} />
-      {rainOn && <RainEffect intensity={50} />}
+      {rainOn && <RainEffect intensity={55} />}
 
       <AmbientControls
         rainOn={rainOn}
@@ -119,33 +88,16 @@ const Index = () => {
         <SceneTransition sceneKey={scene}>
           {scene === "entry" && <EntryScene onEnter={handleEnter} />}
           {scene === "menu" && (
-            <MenuScene
-              userName={userName}
-              onSelectCoffee={handleCoffeeSelect}
-              onSelectSnack={handleSnackSelect}
-              selectedSnack={selectedSnack}
-            />
+            <MenuScene userName={userName} onSelectCoffee={handleCoffeeSelect} onSelectSnack={handleSnackSelect} selectedSnack={selectedSnack} />
           )}
           {scene === "selection" && selectedCoffee && (
-            <SelectionScene
-              coffee={selectedCoffee}
-              onConfirm={handleConfirmSelection}
-              onBack={() => setScene("menu")}
-            />
+            <SelectionScene coffee={selectedCoffee} onConfirm={handleConfirmSelection} onBack={() => setScene("menu")} />
           )}
           {scene === "beans" && selectedCoffee && (
-            <BeanSelectionScene
-              coffee={selectedCoffee}
-              onSelect={handleBeanSelect}
-              onBack={() => setScene("selection")}
-            />
+            <BeanSelectionScene coffee={selectedCoffee} onSelect={handleBeanSelect} onBack={() => setScene("selection")} />
           )}
           {scene === "grinding" && selectedCoffee && (
-            <GrindingScene
-              coffee={selectedCoffee}
-              roastType={roastType}
-              onComplete={() => setScene("making")}
-            />
+            <GrindingScene coffee={selectedCoffee} roastType={roastType} onComplete={() => setScene("making")} />
           )}
           {scene === "making" && selectedCoffee && (
             <MakingScene coffee={selectedCoffee} onComplete={() => setScene("recipe")} />
@@ -154,13 +106,7 @@ const Index = () => {
             <RecipeScene coffee={selectedCoffee} onContinue={() => setScene("final")} />
           )}
           {scene === "final" && selectedCoffee && (
-            <FinalScene
-              coffee={selectedCoffee}
-              quantity={quantity}
-              userName={userName}
-              selectedSnack={selectedSnack}
-              onRestart={handleRestart}
-            />
+            <FinalScene coffee={selectedCoffee} quantity={quantity} userName={userName} selectedSnack={selectedSnack} onRestart={handleRestart} />
           )}
         </SceneTransition>
       </AnimatePresence>
