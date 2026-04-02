@@ -7,32 +7,39 @@ import BeanSelectionScene from "@/components/coffee/BeanSelectionScene";
 import GrindingScene from "@/components/coffee/GrindingScene";
 import MakingScene from "@/components/coffee/MakingScene";
 import RecipeScene from "@/components/coffee/RecipeScene";
-import FinalScene from "@/components/coffee/FinalScene";
+import ArtCorner from "@/components/coffee/ArtCorner";
+import ServingScene from "@/components/coffee/ServingScene";
 import ProgressIndicator from "@/components/coffee/ProgressIndicator";
 import SceneTransition from "@/components/coffee/SceneTransition";
 import RainEffect from "@/components/coffee/RainEffect";
 import WindowScene from "@/components/coffee/WindowScene";
+import CafeEnvironment from "@/components/coffee/CafeEnvironment";
 import AmbientControls from "@/components/coffee/AmbientControls";
+import ArtButton from "@/components/coffee/ArtButton";
 import type { CoffeeType } from "@/components/coffee/MenuScene";
 import type { RoastType } from "@/components/coffee/BeanSelectionScene";
 
-type Scene = "entry" | "menu" | "selection" | "beans" | "grinding" | "making" | "recipe" | "final";
+type Gender = "female" | "male";
+type Scene = "entry" | "menu" | "selection" | "beans" | "grinding" | "making" | "recipe" | "art" | "final";
 
 const sceneIndex: Record<Scene, number> = {
-  entry: 0, menu: 1, selection: 2, beans: 3, grinding: 4, making: 5, recipe: 6, final: 7,
+  entry: 0, menu: 1, selection: 2, beans: 3, grinding: 4, making: 5, recipe: 6, art: 7, final: 8,
 };
 
 const Index = () => {
   const [scene, setScene] = useState<Scene>("entry");
   const [userName, setUserName] = useState("");
+  const [gender, setGender] = useState<Gender>("female");
   const [selectedCoffee, setSelectedCoffee] = useState<CoffeeType | null>(null);
   const [selectedSnack, setSelectedSnack] = useState<CoffeeType | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [cupSize, setCupSize] = useState("medium");
   const [roastType, setRoastType] = useState<RoastType>("medium");
+  const [paintingDataUrl, setPaintingDataUrl] = useState<string | null>(null);
   const [rainOn, setRainOn] = useState(true);
   const [ambiance, setAmbiance] = useState<"morning" | "evening" | "night">("evening");
   const [soundOn, setSoundOn] = useState(false);
+  const [previousScene, setPreviousScene] = useState<Scene | null>(null);
 
   useEffect(() => {
     if (ambiance === "night") {
@@ -49,7 +56,11 @@ const Index = () => {
     );
   };
 
-  const handleEnter = (name: string) => { setUserName(name); setScene("menu"); };
+  const handleEnter = (name: string, g: Gender) => {
+    setUserName(name);
+    setGender(g);
+    setScene("menu");
+  };
   const handleCoffeeSelect = (coffee: CoffeeType) => { setSelectedCoffee(coffee); setScene("selection"); };
   const handleSnackSelect = (snack: CoffeeType) => { setSelectedSnack(snack); };
   const handleConfirmSelection = (qty: number, size: string) => {
@@ -57,9 +68,23 @@ const Index = () => {
     setScene(selectedCoffee?.category === "coffee" ? "beans" : "recipe");
   };
   const handleBeanSelect = (roast: RoastType) => { setRoastType(roast); setScene("grinding"); };
+
+  const handleOpenArt = () => {
+    setPreviousScene(scene);
+    setScene("art");
+  };
+  const handleCloseArt = () => {
+    setScene(previousScene || "menu");
+  };
+  const handleSaveArt = (dataUrl: string) => {
+    setPaintingDataUrl(dataUrl);
+    setScene(previousScene || "menu");
+  };
+
   const handleRestart = () => {
     setSelectedCoffee(null); setSelectedSnack(null);
     setQuantity(1); setCupSize("medium"); setRoastType("medium");
+    setPaintingDataUrl(null);
     setScene("menu");
   };
 
@@ -71,6 +96,7 @@ const Index = () => {
       }} />
 
       <WindowScene ambiance={ambiance} />
+      {scene !== "entry" && <CafeEnvironment />}
       {rainOn && <RainEffect intensity={55} />}
 
       <AmbientControls
@@ -82,7 +108,12 @@ const Index = () => {
         onToggleSound={() => setSoundOn(!soundOn)}
       />
 
-      {scene !== "entry" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
+      {/* Art button - visible on most scenes except entry and art */}
+      {scene !== "entry" && scene !== "art" && (
+        <ArtButton onClick={handleOpenArt} />
+      )}
+
+      {scene !== "entry" && scene !== "art" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
 
       <AnimatePresence mode="wait">
         <SceneTransition sceneKey={scene}>
@@ -105,8 +136,19 @@ const Index = () => {
           {scene === "recipe" && selectedCoffee && (
             <RecipeScene coffee={selectedCoffee} onContinue={() => setScene("final")} />
           )}
+          {scene === "art" && (
+            <ArtCorner onClose={handleCloseArt} onSave={handleSaveArt} />
+          )}
           {scene === "final" && selectedCoffee && (
-            <FinalScene coffee={selectedCoffee} quantity={quantity} userName={userName} selectedSnack={selectedSnack} onRestart={handleRestart} />
+            <ServingScene
+              coffee={selectedCoffee}
+              quantity={quantity}
+              userName={userName}
+              gender={gender}
+              selectedSnack={selectedSnack}
+              paintingDataUrl={paintingDataUrl}
+              onRestart={handleRestart}
+            />
           )}
         </SceneTransition>
       </AnimatePresence>

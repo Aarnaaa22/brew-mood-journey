@@ -1,21 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import cafeExterior from "@/assets/cafe-exterior.jpg";
 
+type Gender = "female" | "male";
+
 interface EntrySceneProps {
-  onEnter: (name: string) => void;
+  onEnter: (name: string, gender: Gender) => void;
 }
 
 const EntryScene = ({ onEnter }: EntrySceneProps) => {
   const [doorOpen, setDoorOpen] = useState(false);
   const [userName, setUserName] = useState("");
+  const [gender, setGender] = useState<Gender | null>(null);
   const [warmLightVisible, setWarmLightVisible] = useState(false);
 
+  const canEnter = userName.trim() && gender;
+
   const handleEnter = () => {
-    if (!userName.trim()) return;
+    if (!canEnter) return;
     setDoorOpen(true);
     setWarmLightVisible(true);
-    setTimeout(() => onEnter(userName.trim()), 1800);
+    setTimeout(() => onEnter(userName.trim(), gender!), 1800);
   };
 
   return (
@@ -114,7 +119,7 @@ const EntryScene = ({ onEnter }: EntrySceneProps) => {
 
         {/* Name input */}
         <motion.div
-          className="mb-8"
+          className="mb-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
@@ -132,21 +137,49 @@ const EntryScene = ({ onEnter }: EntrySceneProps) => {
           />
         </motion.div>
 
+        {/* Gender selection */}
+        <motion.div
+          className="mb-8 flex justify-center gap-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
+        >
+          {([
+            { id: "female" as Gender, label: "She / Her", emoji: "👩" },
+            { id: "male" as Gender, label: "He / Him", emoji: "👨" },
+          ]).map((g) => (
+            <motion.button
+              key={g.id}
+              onClick={() => setGender(g.id)}
+              className={`px-5 py-3 rounded-2xl font-handwritten text-lg cursor-pointer backdrop-blur-md border transition-all duration-300 flex items-center gap-2 ${
+                gender === g.id
+                  ? "bg-coffee-caramel/60 text-coffee-cream border-coffee-cream/30 shadow-glow"
+                  : "bg-coffee-dark/40 text-coffee-cream/50 border-coffee-cream/10 hover:border-coffee-cream/20"
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="text-2xl">{g.emoji}</span>
+              <span>{g.label}</span>
+            </motion.button>
+          ))}
+        </motion.div>
+
         <motion.button
           onClick={handleEnter}
           className={`group relative px-10 py-4 rounded-full font-handwritten text-2xl backdrop-blur-md border cursor-pointer transition-all duration-500 ${
-            userName.trim()
+            canEnter
               ? "bg-coffee-caramel/80 text-coffee-cream border-coffee-cream/15 shadow-glow"
               : "bg-coffee-dark/30 text-coffee-cream/30 border-coffee-cream/10 cursor-not-allowed"
           }`}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 1.4 }}
-          whileHover={userName.trim() ? { scale: 1.05, boxShadow: "0 0 60px hsl(30 60% 50% / 0.4)" } : {}}
-          whileTap={userName.trim() ? { scale: 0.97 } : {}}
+          transition={{ duration: 0.8, delay: 1.6 }}
+          whileHover={canEnter ? { scale: 1.05, boxShadow: "0 0 60px hsl(30 60% 50% / 0.4)" } : {}}
+          whileTap={canEnter ? { scale: 0.97 } : {}}
         >
           <span className="relative z-10">Enter the Café</span>
-          {userName.trim() && (
+          {canEnter && (
             <motion.div
               className="absolute inset-0 rounded-full bg-coffee-caramel/20"
               animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0, 0.3] }}
@@ -156,7 +189,7 @@ const EntryScene = ({ onEnter }: EntrySceneProps) => {
         </motion.button>
       </motion.div>
 
-      {/* Floating rain particles with trails */}
+      {/* Floating rain particles */}
       {[...Array(12)].map((_, i) => (
         <motion.div
           key={i}
