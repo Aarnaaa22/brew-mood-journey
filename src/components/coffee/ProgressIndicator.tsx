@@ -1,13 +1,12 @@
 import { motion } from "framer-motion";
 
-const steps = ["Menu", "Select", "Beans", "Grind", "Brew", "Recipe", "Enjoy"];
+const steps = ["Menu", "Select", "Beans", "Grind", "Brew", "Recipe", "Art", "Enjoy"];
 
 interface ProgressIndicatorProps {
   currentStep: number;
 }
 
 const ProgressIndicator = ({ currentStep }: ProgressIndicatorProps) => {
-  // Adjust: sceneIndex starts at 1 for menu, so step 0 = menu = index 0
   const stepIdx = Math.max(0, currentStep - 1);
 
   return (
