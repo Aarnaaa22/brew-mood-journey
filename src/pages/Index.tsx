@@ -16,6 +16,7 @@ import WindowScene from "@/components/coffee/WindowScene";
 import CafeEnvironment from "@/components/coffee/CafeEnvironment";
 import AmbientControls from "@/components/coffee/AmbientControls";
 import ArtButton from "@/components/coffee/ArtButton";
+import PaintingPrompt from "@/components/coffee/PaintingPrompt";
 import type { CoffeeType } from "@/components/coffee/MenuScene";
 import type { RoastType } from "@/components/coffee/BeanSelectionScene";
 
@@ -40,6 +41,7 @@ const Index = () => {
   const [ambiance, setAmbiance] = useState<"morning" | "evening" | "night">("evening");
   const [soundOn, setSoundOn] = useState(false);
   const [previousScene, setPreviousScene] = useState<Scene | null>(null);
+  const [showPaintPrompt, setShowPaintPrompt] = useState(false);
 
   useEffect(() => {
     if (ambiance === "night") {
@@ -81,6 +83,20 @@ const Index = () => {
     setScene(previousScene || "menu");
   };
 
+  // After recipe, show painting prompt before final scene
+  const handleRecipeContinue = () => {
+    setShowPaintPrompt(true);
+  };
+  const handleStartPaintingFromPrompt = () => {
+    setShowPaintPrompt(false);
+    setPreviousScene("recipe");
+    setScene("art");
+  };
+  const handleSkipPainting = () => {
+    setShowPaintPrompt(false);
+    setScene("final");
+  };
+
   const handleRestart = () => {
     setSelectedCoffee(null); setSelectedSnack(null);
     setQuantity(1); setCupSize("medium"); setRoastType("medium");
@@ -115,6 +131,16 @@ const Index = () => {
 
       {scene !== "entry" && scene !== "art" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
 
+      {/* Painting prompt overlay */}
+      <AnimatePresence>
+        {showPaintPrompt && (
+          <PaintingPrompt
+            onStartPainting={handleStartPaintingFromPrompt}
+            onSkip={handleSkipPainting}
+          />
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="wait">
         <SceneTransition sceneKey={scene}>
           {scene === "entry" && <EntryScene onEnter={handleEnter} />}
@@ -134,7 +160,7 @@ const Index = () => {
             <MakingScene coffee={selectedCoffee} onComplete={() => setScene("recipe")} />
           )}
           {scene === "recipe" && selectedCoffee && (
-            <RecipeScene coffee={selectedCoffee} onContinue={() => setScene("final")} />
+            <RecipeScene coffee={selectedCoffee} onContinue={handleRecipeContinue} />
           )}
           {scene === "art" && (
             <ArtCorner onClose={handleCloseArt} onSave={handleSaveArt} />
