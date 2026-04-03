@@ -40,8 +40,8 @@ const ServingScene = ({ coffee, quantity, userName, gender, selectedSnack, paint
     return () => clearInterval(interval);
   }, []);
 
-  const npcEmoji = gender === "female" ? "👩" : "👨";
-  const npcLabel = gender === "female" ? "She picks up your coffee with a smile ☕" : "He picks up your coffee with a grin ☕";
+  const npcEmoji = "☕";
+  const npcLabel = "Hey, your coffee is ready!";
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 overflow-hidden relative z-10">
