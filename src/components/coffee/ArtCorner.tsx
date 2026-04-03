@@ -20,32 +20,41 @@ const COLORS = [
 ];
 
 const BRUSH_SIZES = [
-  { label: "Thin", size: 2 },
+  { label: "Small", size: 2 },
   { label: "Medium", size: 6 },
-  { label: "Thick", size: 14 },
+  { label: "Large", size: 14 },
 ];
+
+const ERASER_SIZES = [
+  { label: "S", size: 8 },
+  { label: "M", size: 18 },
+  { label: "L", size: 32 },
+];
+
+const PAPER_COLOR = "hsl(35, 30%, 92%)";
 
 const ArtCorner = ({ onClose, onSave }: ArtCornerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState(COLORS[7].value);
   const [brushSize, setBrushSize] = useState(BRUSH_SIZES[1].size);
+  const [isEraser, setIsEraser] = useState(false);
+  const [eraserSize, setEraserSize] = useState(ERASER_SIZES[1].size);
   const lastPoint = useRef<{ x: number; y: number } | null>(null);
 
-  useEffect(() => {
+  const initCanvas = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    // Paper-like background
-    ctx.fillStyle = "hsl(35, 30%, 92%)";
+    const ctx = canvas?.getContext("2d");
+    if (!ctx || !canvas) return;
+    ctx.fillStyle = PAPER_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Subtle texture
     for (let i = 0; i < 3000; i++) {
       ctx.fillStyle = `hsla(30, 20%, ${60 + Math.random() * 30}%, ${0.03 + Math.random() * 0.04})`;
       ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1, 1);
     }
   }, []);
+
+  useEffect(() => { initCanvas(); }, [initCanvas]);
 
   const getPos = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current;
@@ -76,33 +85,44 @@ const ArtCorner = ({ onClose, onSave }: ArtCornerProps) => {
     ctx.beginPath();
     ctx.moveTo(last.x, last.y);
     ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = brushSize;
+
+    if (isEraser) {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.strokeStyle = "rgba(0,0,0,1)";
+      ctx.lineWidth = eraserSize;
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = brushSize;
+      ctx.globalAlpha = 0.85;
+    }
+
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.globalAlpha = 0.85;
     ctx.stroke();
     ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
 
     lastPoint.current = pos;
-  }, [isDrawing, color, brushSize, getPos]);
+  }, [isDrawing, color, brushSize, isEraser, eraserSize, getPos]);
 
   const stopDraw = useCallback(() => {
     setIsDrawing(false);
     lastPoint.current = null;
-  }, []);
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!ctx || !canvas) return;
-    ctx.fillStyle = "hsl(35, 30%, 92%)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < 3000; i++) {
-      ctx.fillStyle = `hsla(30, 20%, ${60 + Math.random() * 30}%, ${0.03 + Math.random() * 0.04})`;
-      ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1, 1);
+    // Redraw paper under erased areas
+    if (isEraser) {
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (ctx && canvas) {
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.fillStyle = PAPER_COLOR;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = "source-over";
+      }
     }
-  };
+  }, [isEraser]);
+
+  const clearCanvas = () => initCanvas();
 
   const handleSave = () => {
     const canvas = canvasRef.current;
@@ -123,7 +143,7 @@ const ArtCorner = ({ onClose, onSave }: ArtCornerProps) => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          Art Corner 🎨
+          Art Corner
         </motion.h2>
         <motion.p
           className="font-handwritten text-xl text-center text-muted-foreground mb-6"
@@ -141,8 +161,11 @@ const ArtCorner = ({ onClose, onSave }: ArtCornerProps) => {
               ref={canvasRef}
               width={640}
               height={400}
-              className="w-full cursor-crosshair touch-none"
-              style={{ aspectRatio: "640/400" }}
+              className="w-full touch-none"
+              style={{
+                aspectRatio: "640/400",
+                cursor: isEraser ? "cell" : "crosshair",
+              }}
               onMouseDown={startDraw}
               onMouseMove={draw}
               onMouseUp={stopDraw}
@@ -153,51 +176,100 @@ const ArtCorner = ({ onClose, onSave }: ArtCornerProps) => {
             />
           </div>
 
-          {/* Color picker */}
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
-            {COLORS.map((c) => (
-              <motion.button
-                key={c.name}
-                onClick={() => setColor(c.value)}
-                className={`w-8 h-8 rounded-full cursor-pointer border-2 transition-all duration-200 ${
-                  color === c.value ? "border-foreground scale-110 shadow-soft" : "border-transparent"
-                }`}
-                style={{ backgroundColor: c.value }}
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
-                title={c.name}
-              />
-            ))}
+          {/* Tool mode toggle */}
+          <div className="flex justify-center gap-2 mb-4">
+            <motion.button
+              onClick={() => setIsEraser(false)}
+              className={`px-5 py-2 rounded-full font-handwritten text-sm cursor-pointer transition-all ${
+                !isEraser ? "bg-accent text-accent-foreground shadow-soft" : "bg-secondary/50 text-secondary-foreground"
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              🖌️ Brush
+            </motion.button>
+            <motion.button
+              onClick={() => setIsEraser(true)}
+              className={`px-5 py-2 rounded-full font-handwritten text-sm cursor-pointer transition-all ${
+                isEraser ? "bg-accent text-accent-foreground shadow-soft" : "bg-secondary/50 text-secondary-foreground"
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              🧽 Eraser
+            </motion.button>
           </div>
 
-          {/* Brush size */}
-          <div className="flex justify-center gap-3 mb-5">
-            {BRUSH_SIZES.map((b) => (
-              <motion.button
-                key={b.label}
-                onClick={() => setBrushSize(b.size)}
-                className={`px-4 py-2 rounded-full font-handwritten text-sm cursor-pointer transition-all duration-200 ${
-                  brushSize === b.size
-                    ? "bg-accent text-accent-foreground"
-                    : "bg-secondary/50 text-secondary-foreground hover:bg-secondary"
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="flex items-center gap-2">
-                  <span
-                    className="rounded-full inline-block"
-                    style={{
-                      width: b.size + 4,
-                      height: b.size + 4,
-                      backgroundColor: color,
-                    }}
+          {!isEraser ? (
+            <>
+              {/* Color picker */}
+              <div className="flex flex-wrap justify-center gap-2 mb-4">
+                {COLORS.map((c) => (
+                  <motion.button
+                    key={c.name}
+                    onClick={() => setColor(c.value)}
+                    className={`w-8 h-8 rounded-full cursor-pointer border-2 transition-all duration-200 ${
+                      color === c.value ? "border-foreground scale-110 shadow-soft" : "border-transparent"
+                    }`}
+                    style={{ backgroundColor: c.value }}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                    title={c.name}
                   />
-                  {b.label}
-                </span>
-              </motion.button>
-            ))}
-          </div>
+                ))}
+              </div>
+
+              {/* Brush size */}
+              <div className="flex justify-center gap-3 mb-5">
+                {BRUSH_SIZES.map((b) => (
+                  <motion.button
+                    key={b.label}
+                    onClick={() => setBrushSize(b.size)}
+                    className={`px-4 py-2 rounded-full font-handwritten text-sm cursor-pointer transition-all duration-200 ${
+                      brushSize === b.size
+                        ? "bg-accent text-accent-foreground"
+                        : "bg-secondary/50 text-secondary-foreground hover:bg-secondary"
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span
+                        className="rounded-full inline-block"
+                        style={{ width: b.size + 4, height: b.size + 4, backgroundColor: color }}
+                      />
+                      {b.label}
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+            </>
+          ) : (
+            /* Eraser size */
+            <div className="flex justify-center gap-3 mb-5">
+              {ERASER_SIZES.map((e) => (
+                <motion.button
+                  key={e.label}
+                  onClick={() => setEraserSize(e.size)}
+                  className={`px-4 py-2 rounded-full font-handwritten text-sm cursor-pointer transition-all duration-200 ${
+                    eraserSize === e.size
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-secondary/50 text-secondary-foreground hover:bg-secondary"
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="rounded-full inline-block border border-border"
+                      style={{ width: e.size / 2 + 4, height: e.size / 2 + 4, backgroundColor: PAPER_COLOR }}
+                    />
+                    {e.label}
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex justify-center gap-3">
@@ -207,7 +279,7 @@ const ArtCorner = ({ onClose, onSave }: ArtCornerProps) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Clear 🗑️
+              Clear
             </motion.button>
             <motion.button
               onClick={handleSave}
@@ -215,7 +287,7 @@ const ArtCorner = ({ onClose, onSave }: ArtCornerProps) => {
               whileHover={{ scale: 1.05, boxShadow: "0 0 25px hsl(var(--accent) / 0.25)" }}
               whileTap={{ scale: 0.95 }}
             >
-              Done ✨
+              Done
             </motion.button>
             <motion.button
               onClick={onClose}
@@ -223,7 +295,7 @@ const ArtCorner = ({ onClose, onSave }: ArtCornerProps) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Back ←
+              Back
             </motion.button>
           </div>
         </div>
