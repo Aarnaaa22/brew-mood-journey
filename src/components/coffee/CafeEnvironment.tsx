@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import CafeCats from "./CafeCats";
 
 const CafeEnvironment = () => {
   return (
