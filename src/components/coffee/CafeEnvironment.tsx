@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import CafeCats from "./CafeCats";
 
 const CafeEnvironment = () => {
   return (
@@ -160,130 +161,7 @@ const CafeEnvironment = () => {
       ))}
 
       {/* === 3 Café Cats === */}
-
-      {/* Orange Cat — sits lazily on chair at table 1 */}
-      <motion.div
-        className="absolute opacity-[0.09]"
-        style={{ left: "6%", bottom: "19%" }}
-      >
-        <div className="relative">
-          {/* Ears */}
-          <div className="flex gap-0.5 justify-center mb-[-1px]">
-            <div className="w-1.5 h-2 rounded-t-full rotate-[-12deg]" style={{ backgroundColor: "hsl(25 70% 50%)" }} />
-            <div className="w-1.5 h-2 rounded-t-full rotate-[12deg]" style={{ backgroundColor: "hsl(25 70% 50%)" }} />
-          </div>
-          {/* Head */}
-          <div className="w-4 h-3.5 rounded-full" style={{ backgroundColor: "hsl(25 70% 50%)" }} />
-          {/* Body (sitting/curled) */}
-          <div className="w-6 h-4 rounded-full -mt-0.5 ml-0.5" style={{ backgroundColor: "hsl(25 65% 48%)" }} />
-          {/* Tail */}
-          <motion.div
-            className="absolute -right-3 bottom-1 w-4 h-1 rounded-full origin-left"
-            style={{ backgroundColor: "hsl(25 60% 45%)" }}
-            animate={{ rotate: [0, 15, -5, 10, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
-          {/* Occasional stretch */}
-          <motion.div
-            className="absolute top-2 -left-1 w-2 h-0.5 rounded-full origin-right"
-            style={{ backgroundColor: "hsl(25 65% 48%)" }}
-            animate={{ scaleX: [0, 1, 1, 0], opacity: [0, 0.8, 0.8, 0] }}
-            transition={{ duration: 8, repeat: Infinity, repeatDelay: 12 }}
-          />
-        </div>
-      </motion.div>
-
-      {/* Tuxedo Cat (black & white) — walks slowly across café floor */}
-      <motion.div
-        className="absolute opacity-[0.09]"
-        style={{ bottom: "8%" }}
-        animate={{
-          left: ["15%", "50%", "70%", "55%", "30%", "15%"],
-        }}
-        transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="relative">
-          {/* Ears */}
-          <div className="flex gap-0.5 justify-center mb-[-1px]">
-            <div className="w-1 h-1.5 bg-foreground rounded-t-full rotate-[-10deg]" />
-            <div className="w-1 h-1.5 bg-foreground rounded-t-full rotate-[10deg]" />
-          </div>
-          {/* Head */}
-          <div className="w-3.5 h-3 rounded-full bg-foreground" />
-          {/* White chin */}
-          <div className="absolute top-[8px] left-[5px] w-1.5 h-1 rounded-full bg-background/30" />
-          {/* Body */}
-          <div className="w-5 h-3 rounded-full bg-foreground -mt-0.5 ml-0.5" />
-          {/* White chest patch */}
-          <div className="absolute top-[13px] left-[6px] w-2 h-1.5 rounded-full bg-background/20" />
-          {/* Walking legs */}
-          <motion.div
-            className="flex gap-1 -mt-0.5 ml-0.5"
-            animate={{ y: [0, -1, 0] }}
-            transition={{ duration: 0.6, repeat: Infinity }}
-          >
-            <div className="w-0.5 h-2 bg-foreground rounded-b" />
-            <div className="w-0.5 h-2 bg-foreground rounded-b" />
-            <div className="w-0.5 h-2 bg-foreground rounded-b" />
-            <div className="w-0.5 h-2 bg-foreground rounded-b" />
-          </motion.div>
-          {/* Tail */}
-          <motion.div
-            className="absolute -right-3 top-3 w-4 h-0.5 bg-foreground rounded-full origin-left"
-            animate={{ rotate: [-10, 20, -5, 15, -10] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          />
-        </div>
-        {/* Pause and look around */}
-        <motion.div
-          className="absolute top-0 left-0 w-full h-full"
-          animate={{ scaleX: [1, 1, -1, -1, 1] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.div>
-
-      {/* Grey Tabby Cat — sits near window watching rain */}
-      <motion.div
-        className="absolute opacity-[0.09]"
-        style={{ left: "85%", bottom: "25%" }}
-      >
-        <div className="relative">
-          {/* Ears with movement */}
-          <div className="flex gap-0.5 justify-center mb-[-1px]">
-            <motion.div
-              className="w-1.5 h-2 rounded-t-full rotate-[-10deg]"
-              style={{ backgroundColor: "hsl(0 0% 50%)" }}
-              animate={{ rotate: [-10, -5, -10] }}
-              transition={{ duration: 4, repeat: Infinity }}
-            />
-            <motion.div
-              className="w-1.5 h-2 rounded-t-full rotate-[10deg]"
-              style={{ backgroundColor: "hsl(0 0% 50%)" }}
-              animate={{ rotate: [10, 15, 10] }}
-              transition={{ duration: 5, repeat: Infinity }}
-            />
-          </div>
-          {/* Head (looking toward window) */}
-          <motion.div
-            className="w-4 h-3.5 rounded-full"
-            style={{ backgroundColor: "hsl(0 0% 48%)" }}
-            animate={{ rotate: [5, 8, 5, 3, 5] }}
-            transition={{ duration: 7, repeat: Infinity }}
-          />
-          {/* Tabby stripes */}
-          <div className="absolute top-[10px] left-[3px] w-3 h-0.5 rounded bg-foreground/10" />
-          <div className="absolute top-[13px] left-[4px] w-2.5 h-0.5 rounded bg-foreground/10" />
-          {/* Body (sitting upright) */}
-          <div className="w-5 h-5 rounded-b-xl rounded-t-lg -mt-0.5" style={{ backgroundColor: "hsl(0 0% 45%)" }} />
-          {/* Tail curled beside */}
-          <motion.div
-            className="absolute -left-2 bottom-0 w-3 h-1 rounded-full origin-right"
-            style={{ backgroundColor: "hsl(0 0% 42%)" }}
-            animate={{ rotate: [0, -10, 5, -8, 0] }}
-            transition={{ duration: 5, repeat: Infinity }}
-          />
-        </div>
-      </motion.div>
+      <CafeCats />
 
       {/* Subtle counter area */}
       <div
