@@ -42,8 +42,6 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
   const steps = getSteps(coffee);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [dragging, setDragging] = useState<string | null>(null);
-  const [machineVibrating, setMachineVibrating] = useState(false);
   const [pouring, setPouring] = useState(false);
   const [perfectBrew, setPerfectBrew] = useState(true);
 
