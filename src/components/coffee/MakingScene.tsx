@@ -122,10 +122,14 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           {/* Coffee station */}
           <div className="flex justify-between items-end mb-6 px-4">
             {/* Machine */}
+            {/* Machine - clickable */}
             <motion.div
-              className="flex flex-col items-center"
+              className="flex flex-col items-center cursor-pointer select-none"
               animate={machineVibrating ? { x: [-2, 2, -1, 1, 0] } : {}}
               transition={{ duration: 0.1, repeat: machineVibrating ? 5 : 0 }}
+              onClick={() => { if (!completedSteps.includes(currentStep) && !allDone) handleStep(); }}
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.95 }}
             >
               <div className="w-16 h-20 bg-secondary rounded-lg border border-border relative shadow-soft">
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-accent" />
@@ -146,7 +150,17 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                   />
                 )}
               </div>
-              <span className="font-handwritten text-xs text-muted-foreground mt-1">Machine</span>
+              <span className="font-handwritten text-xs text-muted-foreground mt-1">
+                {!allDone ? `▶ ${step?.label}` : "Done!"}
+              </span>
+              {/* Pulsing hint ring */}
+              {!allDone && !completedSteps.includes(currentStep) && (
+                <motion.div
+                  className="absolute -inset-2 rounded-xl border-2 border-accent/30 pointer-events-none"
+                  animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.15, 0.4] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              )}
             </motion.div>
 
             {/* Milk jug */}
