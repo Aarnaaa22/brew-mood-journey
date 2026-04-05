@@ -94,7 +94,7 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           Brewing Your {coffee.name}
         </h2>
         <p className="font-handwritten text-xl text-center text-muted-foreground mb-6">
-          Drag ingredients or tap to craft
+          Tap the machine to brew
         </p>
 
         {/* Circular progress */}
