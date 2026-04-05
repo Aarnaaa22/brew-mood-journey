@@ -63,12 +63,6 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
     }
   }, [currentStep, steps.length, onComplete]);
 
-  const handleDrop = useCallback(() => {
-    if (dragging) {
-      setDragging(null);
-      handleStep();
-    }
-  }, [dragging, handleStep]);
 
   const layerColors: Record<string, string> = {
     "Insert Grounds": "hsl(20 40% 15%)",
