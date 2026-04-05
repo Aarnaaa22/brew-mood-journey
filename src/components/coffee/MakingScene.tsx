@@ -190,7 +190,6 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
             <motion.div
               className="relative w-40 h-48"
               animate={pouring ? { y: [0, 1, 0] } : {}}
-              animate={pouring ? { y: [0, 1, 0] } : {}}
               transition={{ duration: 0.3 }}
             >
               {/* Table shadow ripple */}
