@@ -189,8 +189,7 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           <div className="flex justify-center mb-8">
             <motion.div
               className="relative w-40 h-48"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
+              animate={pouring ? { y: [0, 1, 0] } : {}}
               animate={pouring ? { y: [0, 1, 0] } : {}}
               transition={{ duration: 0.3 }}
             >
