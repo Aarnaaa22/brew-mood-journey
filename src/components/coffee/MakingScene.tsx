@@ -42,11 +42,9 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
   const steps = getSteps(coffee);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [dragging, setDragging] = useState<string | null>(null);
   const [machineVibrating, setMachineVibrating] = useState(false);
   const [pouring, setPouring] = useState(false);
-  const [perfectBrew, setPerfectBrew] = useState(true);
-
+  const [perfectBrew] = useState(true);
   const progress = (completedSteps.length / steps.length) * 100;
   const step = steps[currentStep];
   const allDone = completedSteps.length === steps.length;
@@ -65,12 +63,6 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
     }
   }, [currentStep, steps.length, onComplete]);
 
-  const handleDrop = useCallback(() => {
-    if (dragging) {
-      setDragging(null);
-      handleStep();
-    }
-  }, [dragging, handleStep]);
 
   const layerColors: Record<string, string> = {
     "Insert Grounds": "hsl(20 40% 15%)",
@@ -94,7 +86,7 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           Brewing Your {coffee.name}
         </h2>
         <p className="font-handwritten text-xl text-center text-muted-foreground mb-6">
-          Drag ingredients or tap to craft
+          Tap the machine to brew
         </p>
 
         {/* Circular progress */}
@@ -122,10 +114,14 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           {/* Coffee station */}
           <div className="flex justify-between items-end mb-6 px-4">
             {/* Machine */}
+            {/* Machine - clickable */}
             <motion.div
-              className="flex flex-col items-center"
+              className="flex flex-col items-center cursor-pointer select-none"
               animate={machineVibrating ? { x: [-2, 2, -1, 1, 0] } : {}}
               transition={{ duration: 0.1, repeat: machineVibrating ? 5 : 0 }}
+              onClick={() => { if (!completedSteps.includes(currentStep) && !allDone) handleStep(); }}
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.95 }}
             >
               <div className="w-16 h-20 bg-secondary rounded-lg border border-border relative shadow-soft">
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-accent" />
@@ -146,7 +142,17 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                   />
                 )}
               </div>
-              <span className="font-handwritten text-xs text-muted-foreground mt-1">Machine</span>
+              <span className="font-handwritten text-xs text-muted-foreground mt-1">
+                {!allDone ? `▶ ${step?.label}` : "Done!"}
+              </span>
+              {/* Pulsing hint ring */}
+              {!allDone && !completedSteps.includes(currentStep) && (
+                <motion.div
+                  className="absolute -inset-2 rounded-xl border-2 border-accent/30 pointer-events-none"
+                  animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.15, 0.4] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              )}
             </motion.div>
 
             {/* Milk jug */}
@@ -183,8 +189,6 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           <div className="flex justify-center mb-8">
             <motion.div
               className="relative w-40 h-48"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
               animate={pouring ? { y: [0, 1, 0] } : {}}
               transition={{ duration: 0.3 }}
             >
@@ -314,41 +318,24 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           )}
         </div>
 
-        {/* Step pills */}
-        <div className="flex gap-2 justify-center flex-wrap mb-6">
+        {/* Step indicator dots */}
+        <div className="flex gap-2 justify-center mb-4">
           {steps.map((s, i) => (
             <motion.div
               key={i}
-              draggable={i === currentStep && !completedSteps.includes(i)}
-              onDragStart={() => setDragging(s.label)}
-              className={`px-3 py-1.5 rounded-full text-sm font-handwritten transition-all duration-300 ${
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                 completedSteps.includes(i)
-                  ? "bg-accent text-accent-foreground"
+                  ? "bg-accent"
                   : i === currentStep
-                  ? "bg-primary text-primary-foreground cursor-grab active:cursor-grabbing shadow-soft"
-                  : "bg-secondary text-secondary-foreground"
+                  ? "bg-primary"
+                  : "bg-secondary"
               }`}
-              animate={i === currentStep && !completedSteps.includes(i) ? { scale: [1, 1.05, 1] } : {}}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              {s.icon} {s.label}
-            </motion.div>
+              animate={i === currentStep && !completedSteps.includes(i) ? { scale: [1, 1.3, 1] } : {}}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              title={s.label}
+            />
           ))}
         </div>
-
-        {!completedSteps.includes(currentStep) && (
-          <motion.button
-            onClick={handleStep}
-            className="w-full py-4 rounded-2xl bg-accent text-accent-foreground font-handwritten text-2xl shadow-soft cursor-pointer"
-            whileHover={{ scale: 1.02, boxShadow: "0 0 30px hsl(var(--accent) / 0.25)" }}
-            whileTap={{ scale: 0.98 }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            {step?.icon} {step?.label}
-          </motion.button>
-        )}
 
         {/* Perfect brew feedback */}
         {allDone && perfectBrew && (
