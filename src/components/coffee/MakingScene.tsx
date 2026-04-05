@@ -328,41 +328,24 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
           )}
         </div>
 
-        {/* Step pills */}
-        <div className="flex gap-2 justify-center flex-wrap mb-6">
+        {/* Step indicator dots */}
+        <div className="flex gap-2 justify-center mb-4">
           {steps.map((s, i) => (
             <motion.div
               key={i}
-              draggable={i === currentStep && !completedSteps.includes(i)}
-              onDragStart={() => setDragging(s.label)}
-              className={`px-3 py-1.5 rounded-full text-sm font-handwritten transition-all duration-300 ${
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                 completedSteps.includes(i)
-                  ? "bg-accent text-accent-foreground"
+                  ? "bg-accent"
                   : i === currentStep
-                  ? "bg-primary text-primary-foreground cursor-grab active:cursor-grabbing shadow-soft"
-                  : "bg-secondary text-secondary-foreground"
+                  ? "bg-primary"
+                  : "bg-secondary"
               }`}
-              animate={i === currentStep && !completedSteps.includes(i) ? { scale: [1, 1.05, 1] } : {}}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              {s.icon} {s.label}
-            </motion.div>
+              animate={i === currentStep && !completedSteps.includes(i) ? { scale: [1, 1.3, 1] } : {}}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              title={s.label}
+            />
           ))}
         </div>
-
-        {!completedSteps.includes(currentStep) && (
-          <motion.button
-            onClick={handleStep}
-            className="w-full py-4 rounded-2xl bg-accent text-accent-foreground font-handwritten text-2xl shadow-soft cursor-pointer"
-            whileHover={{ scale: 1.02, boxShadow: "0 0 30px hsl(var(--accent) / 0.25)" }}
-            whileTap={{ scale: 0.98 }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            {step?.icon} {step?.label}
-          </motion.button>
-        )}
 
         {/* Perfect brew feedback */}
         {allDone && perfectBrew && (
