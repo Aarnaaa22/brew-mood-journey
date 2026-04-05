@@ -42,9 +42,9 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
   const steps = getSteps(coffee);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [machineVibrating, setMachineVibrating] = useState(false);
   const [pouring, setPouring] = useState(false);
-  const [perfectBrew, setPerfectBrew] = useState(true);
-
+  const [perfectBrew] = useState(true);
   const progress = (completedSteps.length / steps.length) * 100;
   const step = steps[currentStep];
   const allDone = completedSteps.length === steps.length;
