@@ -41,6 +41,9 @@ const Index = () => {
   const [ambiance, setAmbiance] = useState<"morning" | "evening" | "night">("evening");
   const [soundOn, setSoundOn] = useState(false);
   const [previousScene, setPreviousScene] = useState<Scene | null>(null);
+
+  // Painting decision state — once set, NEVER re-ask
+  const [paintingDecisionMade, setPaintingDecisionMade] = useState(false);
   const [showPaintPrompt, setShowPaintPrompt] = useState(false);
 
   useEffect(() => {
@@ -83,17 +86,31 @@ const Index = () => {
     setScene(previousScene || "menu");
   };
 
-  // After recipe, show painting prompt before final scene
-  const handleRecipeContinue = () => {
-    setShowPaintPrompt(true);
+  // After making is done, ask about painting ONLY if not already decided
+  const handleMakingComplete = () => {
+    if (!paintingDecisionMade) {
+      setShowPaintPrompt(true);
+    } else {
+      // Already decided — skip straight to recipe
+      setScene("recipe");
+    }
   };
+
   const handleStartPaintingFromPrompt = () => {
+    setPaintingDecisionMade(true);
     setShowPaintPrompt(false);
-    setPreviousScene("recipe");
+    setPreviousScene("making");
     setScene("art");
   };
+
   const handleSkipPainting = () => {
+    setPaintingDecisionMade(true);
     setShowPaintPrompt(false);
+    setScene("recipe");
+  };
+
+  // After recipe, go directly to final — no more paint prompt
+  const handleRecipeContinue = () => {
     setScene("final");
   };
 
@@ -101,6 +118,7 @@ const Index = () => {
     setSelectedCoffee(null); setSelectedSnack(null);
     setQuantity(1); setCupSize("medium"); setRoastType("medium");
     setPaintingDataUrl(null);
+    // Keep paintingDecisionMade — don't re-ask on reorder
     setScene("menu");
   };
 
@@ -131,7 +149,7 @@ const Index = () => {
 
       {scene !== "entry" && scene !== "art" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
 
-      {/* Painting prompt overlay */}
+      {/* Painting prompt overlay — shown only once, after making */}
       <AnimatePresence>
         {showPaintPrompt && (
           <PaintingPrompt
@@ -157,7 +175,7 @@ const Index = () => {
             <GrindingScene coffee={selectedCoffee} roastType={roastType} onComplete={() => setScene("making")} />
           )}
           {scene === "making" && selectedCoffee && (
-            <MakingScene coffee={selectedCoffee} onComplete={() => setScene("recipe")} />
+            <MakingScene coffee={selectedCoffee} onComplete={handleMakingComplete} />
           )}
           {scene === "recipe" && selectedCoffee && (
             <RecipeScene coffee={selectedCoffee} onContinue={handleRecipeContinue} />

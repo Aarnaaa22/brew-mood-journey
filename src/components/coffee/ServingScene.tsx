@@ -24,19 +24,28 @@ const emotionalMessages = [
   "Slow moments matter",
 ];
 
+type NpcPhase = "sitting" | "stand-up" | "walk-to-counter" | "pickup" | "walk-back" | "sit-down" | "done";
+
 const ServingScene = ({ coffee, quantity, userName, gender, selectedSnack, paintingDataUrl, onRestart }: ServingSceneProps) => {
   const [messageIdx, setMessageIdx] = useState(0);
-  const [npcPhase, setNpcPhase] = useState<"walk-to" | "pickup" | "walk-back" | "done">("walk-to");
+  const [npcPhase, setNpcPhase] = useState<NpcPhase>("sitting");
   const [showTable, setShowTable] = useState(false);
 
+  const isFemale = gender === "female";
+
+  // NPC sequence: sitting → stand-up → walk-to-counter → pickup → walk-back → sit-down → done
   useEffect(() => {
-    const t1 = setTimeout(() => setNpcPhase("pickup"), 2200);
-    const t2 = setTimeout(() => setNpcPhase("walk-back"), 3500);
-    const t3 = setTimeout(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    timers.push(setTimeout(() => setNpcPhase("stand-up"), 600));
+    timers.push(setTimeout(() => setNpcPhase("walk-to-counter"), 1200));
+    timers.push(setTimeout(() => setNpcPhase("pickup"), 3200));
+    timers.push(setTimeout(() => setNpcPhase("walk-back"), 4200));
+    timers.push(setTimeout(() => setNpcPhase("sit-down"), 6200));
+    timers.push(setTimeout(() => {
       setNpcPhase("done");
       setShowTable(true);
-    }, 5500);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    }, 7200));
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   useEffect(() => {
@@ -46,13 +55,29 @@ const ServingScene = ({ coffee, quantity, userName, gender, selectedSnack, paint
     return () => clearInterval(interval);
   }, []);
 
-  // NPC x-position: walks from right to counter (center), then to left (user's table)
-  const npcLeft =
-    npcPhase === "walk-to" ? "85%" :
-    npcPhase === "pickup" ? "50%" :
-    npcPhase === "walk-back" ? "15%" : "15%";
+  // NPC positions
+  const npcConfig: Record<NpcPhase, { left: string; bottom: string; scale: number; opacity: number }> = {
+    "sitting":          { left: "80%", bottom: "16%", scale: 0.9, opacity: 1 },
+    "stand-up":         { left: "80%", bottom: "18%", scale: 1, opacity: 1 },
+    "walk-to-counter":  { left: "50%", bottom: "18%", scale: 1, opacity: 1 },
+    "pickup":           { left: "50%", bottom: "18%", scale: 1, opacity: 1 },
+    "walk-back":        { left: "80%", bottom: "18%", scale: 1, opacity: 1 },
+    "sit-down":         { left: "80%", bottom: "16%", scale: 0.9, opacity: 1 },
+    "done":             { left: "80%", bottom: "16%", scale: 0.9, opacity: 0 },
+  };
 
-  const isFemale = gender === "female";
+  const pos = npcConfig[npcPhase];
+  const isWalking = npcPhase === "walk-to-counter" || npcPhase === "walk-back";
+  const hasCup = npcPhase === "pickup" || npcPhase === "walk-back" || npcPhase === "sit-down";
+
+  // Status text
+  const statusText =
+    npcPhase === "sitting" ? "Your coffee is ready at the counter!" :
+    npcPhase === "stand-up" ? `${isFemale ? "She" : "He"} stands up...` :
+    npcPhase === "walk-to-counter" ? `Walking to the counter...` :
+    npcPhase === "pickup" ? "Picking up the coffee..." :
+    npcPhase === "walk-back" ? "Heading back to the table..." :
+    npcPhase === "sit-down" ? "Sitting down..." : "";
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 overflow-hidden relative z-10">
@@ -72,50 +97,54 @@ const ServingScene = ({ coffee, quantity, userName, gender, selectedSnack, paint
       {/* Walking NPC */}
       {npcPhase !== "done" && (
         <motion.div
-          className="fixed bottom-[18%] z-20"
-          initial={{ left: "85%" }}
-          animate={{ left: npcLeft }}
-          transition={{ duration: 2, ease: "easeInOut" }}
+          className="fixed z-20"
+          animate={{
+            left: pos.left,
+            bottom: pos.bottom,
+            scale: pos.scale,
+            opacity: pos.opacity,
+          }}
+          transition={{ duration: 1.8, ease: "easeInOut" }}
         >
           <div className="flex flex-col items-center relative">
             {/* Head */}
             <motion.div
-              className="w-6 h-6 rounded-full bg-foreground/20 relative z-10"
-              animate={{ y: [0, -1.5, 0] }}
-              transition={{ duration: 0.7, repeat: Infinity }}
+              className="w-7 h-7 rounded-full bg-foreground/20 relative z-10"
+              animate={isWalking ? { y: [0, -2, 0] } : {}}
+              transition={{ duration: 0.6, repeat: isWalking ? Infinity : 0 }}
             />
             {/* Hair */}
             {isFemale ? (
-              <div className="absolute -top-1 w-7 h-4 rounded-t-full bg-foreground/12" />
+              <div className="absolute -top-1.5 w-8 h-5 rounded-t-full bg-foreground/12" />
             ) : (
-              <div className="absolute -top-0.5 w-6 h-2 rounded-t-full bg-foreground/12" />
+              <div className="absolute -top-0.5 w-7 h-2.5 rounded-t-full bg-foreground/12" />
             )}
             {/* Body */}
             <div
-              className="w-7 h-11 rounded-b-lg mt-0.5"
+              className="w-8 h-12 rounded-b-lg mt-0.5"
               style={{
                 backgroundColor: isFemale
                   ? "hsl(330 35% 50% / 0.12)"
                   : "hsl(220 25% 40% / 0.12)",
               }}
             />
-            {/* Legs — walking */}
+            {/* Legs */}
             <div className="flex gap-0.5">
               <motion.div
-                className="w-1.5 h-4 bg-foreground/10 rounded-b origin-top"
-                animate={{ rotate: [-12, 12, -12] }}
-                transition={{ duration: 0.7, repeat: Infinity }}
+                className="w-2 h-5 bg-foreground/10 rounded-b origin-top"
+                animate={isWalking ? { rotate: [-15, 15, -15] } : { rotate: 0 }}
+                transition={{ duration: 0.6, repeat: isWalking ? Infinity : 0 }}
               />
               <motion.div
-                className="w-1.5 h-4 bg-foreground/10 rounded-b origin-top"
-                animate={{ rotate: [12, -12, 12] }}
-                transition={{ duration: 0.7, repeat: Infinity }}
+                className="w-2 h-5 bg-foreground/10 rounded-b origin-top"
+                animate={isWalking ? { rotate: [15, -15, 15] } : { rotate: 0 }}
+                transition={{ duration: 0.6, repeat: isWalking ? Infinity : 0 }}
               />
             </div>
-            {/* Cup in hand (visible after pickup) */}
-            {(npcPhase === "pickup" || npcPhase === "walk-back") && (
+            {/* Cup in hand */}
+            {hasCup && (
               <motion.div
-                className="absolute top-7 -right-3 w-3 h-3.5 rounded-sm bg-accent/25 border border-accent/10"
+                className="absolute top-8 -right-3.5 w-3.5 h-4 rounded-sm bg-accent/25 border border-accent/10"
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
@@ -125,7 +154,7 @@ const ServingScene = ({ coffee, quantity, userName, gender, selectedSnack, paint
         </motion.div>
       )}
 
-      {/* "Coffee is ready" text while NPC walks */}
+      {/* Status text while NPC walks */}
       {!showTable && (
         <motion.div
           className="relative z-10 text-center"
@@ -140,9 +169,18 @@ const ServingScene = ({ coffee, quantity, userName, gender, selectedSnack, paint
           >
             Your coffee is ready!
           </motion.h2>
-          <p className="font-handwritten text-xl text-muted-foreground">
-            {isFemale ? "She's" : "He's"} bringing it to your table...
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={npcPhase}
+              className="font-handwritten text-xl text-muted-foreground"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3 }}
+            >
+              {statusText}
+            </motion.p>
+          </AnimatePresence>
         </motion.div>
       )}
 
@@ -177,7 +215,6 @@ const ServingScene = ({ coffee, quantity, userName, gender, selectedSnack, paint
                 >
                   <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-36 h-4 rounded-full bg-secondary/60 border border-border/20" />
                   <div className="relative w-28 h-28">
-                    {/* Glow */}
                     <motion.div
                       className="absolute inset-[-12px] rounded-full"
                       style={{
