@@ -40,7 +40,7 @@ const Index = () => {
   const [rainOn, setRainOn] = useState(true);
   const [ambiance, setAmbiance] = useState<"morning" | "evening" | "night">("evening");
   const [soundOn, setSoundOn] = useState(false);
-  const [previousScene, setPreviousScene] = useState<Scene | null>(null);
+
 
   // Painting decision state — once set, NEVER re-ask
   const [paintingDecisionMade, setPaintingDecisionMade] = useState(false);
@@ -74,16 +74,19 @@ const Index = () => {
   };
   const handleBeanSelect = (roast: RoastType) => { setRoastType(roast); setScene("grinding"); };
 
+  // Track where art was opened from: prompt vs manual button
+  const [artReturnScene, setArtReturnScene] = useState<Scene>("menu");
+
   const handleOpenArt = () => {
-    setPreviousScene(scene);
+    setArtReturnScene(scene);
     setScene("art");
   };
   const handleCloseArt = () => {
-    setScene(previousScene || "menu");
+    setScene(artReturnScene);
   };
   const handleSaveArt = (dataUrl: string) => {
     setPaintingDataUrl(dataUrl);
-    setScene(previousScene || "menu");
+    setScene(artReturnScene);
   };
 
   // After making is done, ask about painting ONLY if not already decided
@@ -91,7 +94,6 @@ const Index = () => {
     if (!paintingDecisionMade) {
       setShowPaintPrompt(true);
     } else {
-      // Already decided — skip straight to recipe
       setScene("recipe");
     }
   };
@@ -99,7 +101,8 @@ const Index = () => {
   const handleStartPaintingFromPrompt = () => {
     setPaintingDecisionMade(true);
     setShowPaintPrompt(false);
-    setPreviousScene("making");
+    // When coming from painting prompt, art should return to recipe flow → final
+    setArtReturnScene("recipe");
     setScene("art");
   };
 
@@ -109,7 +112,7 @@ const Index = () => {
     setScene("recipe");
   };
 
-  // After recipe, go directly to final — no more paint prompt
+  // After recipe, go directly to final
   const handleRecipeContinue = () => {
     setScene("final");
   };
