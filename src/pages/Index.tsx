@@ -40,7 +40,7 @@ const Index = () => {
   const [rainOn, setRainOn] = useState(true);
   const [ambiance, setAmbiance] = useState<"morning" | "evening" | "night">("evening");
   const [soundOn, setSoundOn] = useState(false);
-  const [previousScene, setPreviousScene] = useState<Scene | null>(null);
+
 
   // Painting decision state — once set, NEVER re-ask
   const [paintingDecisionMade, setPaintingDecisionMade] = useState(false);
