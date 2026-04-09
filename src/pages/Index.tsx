@@ -23,7 +23,7 @@ import type { CoffeeType } from "@/components/coffee/MenuScene";
 import type { RoastType } from "@/components/coffee/BeanSelectionScene";
 
 type Gender = "female" | "male";
-type Scene = "entry" | "menu" | "selection" | "beans" | "grinding" | "making" | "recipe" | "art" | "final";
+type Scene = "entry" | "menu" | "selection" | "beans" | "grinding" | "making" | "recipe" | "art" | "games" | "final";
 
 const sceneIndex: Record<Scene, number> = {
   entry: 0, menu: 1, selection: 2, beans: 3, grinding: 4, making: 5, recipe: 6, art: 7, final: 8,
