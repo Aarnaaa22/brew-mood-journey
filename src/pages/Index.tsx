@@ -16,17 +16,15 @@ import WindowScene from "@/components/coffee/WindowScene";
 import CafeEnvironment from "@/components/coffee/CafeEnvironment";
 import AmbientControls from "@/components/coffee/AmbientControls";
 import ArtButton from "@/components/coffee/ArtButton";
-import GamesButton from "@/components/coffee/GamesButton";
-import GamesScene from "@/components/coffee/GamesScene";
 import PaintingPrompt from "@/components/coffee/PaintingPrompt";
 import type { CoffeeType } from "@/components/coffee/MenuScene";
 import type { RoastType } from "@/components/coffee/BeanSelectionScene";
 
 type Gender = "female" | "male";
-type Scene = "entry" | "menu" | "selection" | "beans" | "grinding" | "making" | "recipe" | "art" | "games" | "final";
+type Scene = "entry" | "menu" | "selection" | "beans" | "grinding" | "making" | "recipe" | "art" | "final";
 
 const sceneIndex: Record<Scene, number> = {
-  entry: 0, menu: 1, selection: 2, beans: 3, grinding: 4, making: 5, recipe: 6, art: 7, games: 7, final: 8,
+  entry: 0, menu: 1, selection: 2, beans: 3, grinding: 4, making: 5, recipe: 6, art: 7, final: 8,
 };
 
 const Index = () => {
@@ -78,7 +76,6 @@ const Index = () => {
 
   // Track where art was opened from: prompt vs manual button
   const [artReturnScene, setArtReturnScene] = useState<Scene>("menu");
-  const [gamesReturnScene, setGamesReturnScene] = useState<Scene>("menu");
 
   const handleOpenArt = () => {
     setArtReturnScene(scene);
@@ -90,14 +87,6 @@ const Index = () => {
   const handleSaveArt = (dataUrl: string) => {
     setPaintingDataUrl(dataUrl);
     setScene(artReturnScene);
-  };
-
-  const handleOpenGames = () => {
-    setGamesReturnScene(scene);
-    setScene("games");
-  };
-  const handleCloseGames = () => {
-    setScene(gamesReturnScene);
   };
 
   // After making is done, ask about painting ONLY if not already decided
@@ -156,15 +145,12 @@ const Index = () => {
         onToggleSound={() => setSoundOn(!soundOn)}
       />
 
-      {/* Art & Games buttons - visible on most scenes except entry, art, games */}
-      {scene !== "entry" && scene !== "art" && scene !== "games" && (
-        <>
-          <ArtButton onClick={handleOpenArt} />
-          <GamesButton onClick={handleOpenGames} />
-        </>
+      {/* Art button - visible on most scenes except entry and art */}
+      {scene !== "entry" && scene !== "art" && (
+        <ArtButton onClick={handleOpenArt} />
       )}
 
-      {scene !== "entry" && scene !== "art" && scene !== "games" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
+      {scene !== "entry" && scene !== "art" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
 
       {/* Painting prompt overlay — shown only once, after making */}
       <AnimatePresence>
@@ -199,9 +185,6 @@ const Index = () => {
           )}
           {scene === "art" && (
             <ArtCorner onClose={handleCloseArt} onSave={handleSaveArt} />
-          )}
-          {scene === "games" && (
-            <GamesScene onClose={handleCloseGames} />
           )}
           {scene === "final" && selectedCoffee && (
             <ServingScene
