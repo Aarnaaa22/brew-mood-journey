@@ -16,6 +16,8 @@ import WindowScene from "@/components/coffee/WindowScene";
 import CafeEnvironment from "@/components/coffee/CafeEnvironment";
 import AmbientControls from "@/components/coffee/AmbientControls";
 import ArtButton from "@/components/coffee/ArtButton";
+import GamesButton from "@/components/coffee/GamesButton";
+import GamesScene from "@/components/coffee/GamesScene";
 import PaintingPrompt from "@/components/coffee/PaintingPrompt";
 import type { CoffeeType } from "@/components/coffee/MenuScene";
 import type { RoastType } from "@/components/coffee/BeanSelectionScene";
