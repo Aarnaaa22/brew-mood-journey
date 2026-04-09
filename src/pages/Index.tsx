@@ -26,7 +26,7 @@ type Gender = "female" | "male";
 type Scene = "entry" | "menu" | "selection" | "beans" | "grinding" | "making" | "recipe" | "art" | "games" | "final";
 
 const sceneIndex: Record<Scene, number> = {
-  entry: 0, menu: 1, selection: 2, beans: 3, grinding: 4, making: 5, recipe: 6, art: 7, final: 8,
+  entry: 0, menu: 1, selection: 2, beans: 3, grinding: 4, making: 5, recipe: 6, art: 7, games: 7, final: 8,
 };
 
 const Index = () => {
