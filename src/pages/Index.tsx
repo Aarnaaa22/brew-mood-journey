@@ -78,6 +78,7 @@ const Index = () => {
 
   // Track where art was opened from: prompt vs manual button
   const [artReturnScene, setArtReturnScene] = useState<Scene>("menu");
+  const [gamesReturnScene, setGamesReturnScene] = useState<Scene>("menu");
 
   const handleOpenArt = () => {
     setArtReturnScene(scene);
@@ -89,6 +90,14 @@ const Index = () => {
   const handleSaveArt = (dataUrl: string) => {
     setPaintingDataUrl(dataUrl);
     setScene(artReturnScene);
+  };
+
+  const handleOpenGames = () => {
+    setGamesReturnScene(scene);
+    setScene("games");
+  };
+  const handleCloseGames = () => {
+    setScene(gamesReturnScene);
   };
 
   // After making is done, ask about painting ONLY if not already decided
@@ -147,12 +156,15 @@ const Index = () => {
         onToggleSound={() => setSoundOn(!soundOn)}
       />
 
-      {/* Art button - visible on most scenes except entry and art */}
-      {scene !== "entry" && scene !== "art" && (
-        <ArtButton onClick={handleOpenArt} />
+      {/* Art & Games buttons - visible on most scenes except entry, art, games */}
+      {scene !== "entry" && scene !== "art" && scene !== "games" && (
+        <>
+          <ArtButton onClick={handleOpenArt} />
+          <GamesButton onClick={handleOpenGames} />
+        </>
       )}
 
-      {scene !== "entry" && scene !== "art" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
+      {scene !== "entry" && scene !== "art" && scene !== "games" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
 
       {/* Painting prompt overlay — shown only once, after making */}
       <AnimatePresence>
@@ -187,6 +199,9 @@ const Index = () => {
           )}
           {scene === "art" && (
             <ArtCorner onClose={handleCloseArt} onSave={handleSaveArt} />
+          )}
+          {scene === "games" && (
+            <GamesScene onClose={handleCloseGames} />
           )}
           {scene === "final" && selectedCoffee && (
             <ServingScene
