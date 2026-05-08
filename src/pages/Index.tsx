@@ -148,10 +148,17 @@ const Index = () => {
         onToggleSound={() => setSoundOn(!soundOn)}
       />
 
-      {/* Art button - visible on most scenes except entry and art */}
+      {/* Art & Games buttons - visible on most scenes except entry and art */}
       {scene !== "entry" && scene !== "art" && (
-        <ArtButton onClick={handleOpenArt} />
+        <>
+          <ArtButton onClick={handleOpenArt} />
+          <GamesButton onClick={() => setShowGames(true)} />
+        </>
       )}
+
+      <AnimatePresence>
+        {showGames && <GamesCorner onClose={() => setShowGames(false)} />}
+      </AnimatePresence>
 
       {scene !== "entry" && scene !== "art" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
 
