@@ -333,16 +333,29 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                   return (
                     <motion.div
                       key={stepIdx}
-                      className="absolute left-0 right-0"
+                      className="absolute left-0 right-0 overflow-hidden"
                       style={{
                         bottom: `${i * layerHeight}%`,
                         height: `${layerHeight}%`,
-                        backgroundColor: color,
+                        background: color,
+                        boxShadow: i === completedSteps.length - 1
+                          ? "inset 0 4px 8px hsl(40 30% 95% / 0.22), inset 0 -3px 8px hsl(20 30% 8% / 0.35)"
+                          : "inset 0 -2px 4px hsl(20 30% 10% / 0.2)",
                       }}
                       initial={{ scaleY: 0 }}
                       animate={{ scaleY: 1 }}
                       transition={{ duration: 0.7, ease: "easeOut" }}
-                    />
+                    >
+                      {i === completedSteps.length - 1 && (
+                        <div
+                          className="absolute top-0 left-0 right-0 h-2 pointer-events-none"
+                          style={{
+                            background:
+                              "linear-gradient(180deg, hsl(40 40% 96% / 0.4), transparent)",
+                          }}
+                        />
+                      )}
+                    </motion.div>
                   );
                 })}
 
