@@ -440,7 +440,26 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                 )}
               </div>
               {/* Handle */}
-              <div className="absolute right-[-14px] top-1/3 w-5 h-12 border-2 border-coffee-medium/30 rounded-r-full" />
+              {/* Vintage ceramic handle */}
+              <div
+                className="absolute right-[-16px] top-[35%] w-6 h-14 rounded-r-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, hsl(35 25% 78%) 0%, hsl(30 22% 68%) 50%, hsl(25 25% 50%) 100%)",
+                  border: "1.5px solid hsl(28 35% 28% / 0.55)",
+                  borderLeft: "none",
+                  boxShadow:
+                    "inset -2px 0 4px hsl(20 30% 12% / 0.35), inset 2px 0 3px hsl(40 35% 95% / 0.4), 2px 3px 6px hsl(20 30% 12% / 0.3)",
+                }}
+              />
+              {/* Soft shadow under cup */}
+              <div
+                className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-40 h-3 rounded-full pointer-events-none"
+                style={{
+                  background: "radial-gradient(ellipse, hsl(20 30% 10% / 0.35), transparent 70%)",
+                  filter: "blur(4px)",
+                }}
+              />
             </motion.div>
           </div>
 
