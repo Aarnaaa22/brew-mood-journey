@@ -369,7 +369,8 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                       top: `${blob.y}%`,
                       width: blob.size,
                       height: blob.size * 0.7,
-                      background: "radial-gradient(ellipse, hsl(40 30% 95% / 0.95), hsl(40 20% 88% / 0.7))",
+                      background:
+                        "radial-gradient(ellipse at 35% 35%, hsl(42 35% 97% / 0.98), hsl(38 25% 88% / 0.85) 55%, hsl(32 20% 76% / 0.6))",
                       transform: "translate(-50%, -50%)",
                       filter: "blur(1px)",
                     }}
