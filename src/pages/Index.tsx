@@ -16,6 +16,8 @@ import WindowScene from "@/components/coffee/WindowScene";
 import CafeEnvironment from "@/components/coffee/CafeEnvironment";
 import AmbientControls from "@/components/coffee/AmbientControls";
 import ArtButton from "@/components/coffee/ArtButton";
+import GamesButton from "@/components/coffee/GamesButton";
+import GamesCorner from "@/components/coffee/GamesCorner";
 import PaintingPrompt from "@/components/coffee/PaintingPrompt";
 import type { CoffeeType } from "@/components/coffee/MenuScene";
 import type { RoastType } from "@/components/coffee/BeanSelectionScene";
@@ -40,6 +42,7 @@ const Index = () => {
   const [rainOn, setRainOn] = useState(true);
   const [ambiance, setAmbiance] = useState<"morning" | "evening" | "night">("evening");
   const [soundOn, setSoundOn] = useState(false);
+  const [showGames, setShowGames] = useState(false);
 
 
   // Painting decision state — once set, NEVER re-ask
@@ -145,10 +148,17 @@ const Index = () => {
         onToggleSound={() => setSoundOn(!soundOn)}
       />
 
-      {/* Art button - visible on most scenes except entry and art */}
+      {/* Art & Games buttons - visible on most scenes except entry and art */}
       {scene !== "entry" && scene !== "art" && (
-        <ArtButton onClick={handleOpenArt} />
+        <>
+          <ArtButton onClick={handleOpenArt} />
+          <GamesButton onClick={() => setShowGames(true)} />
+        </>
       )}
+
+      <AnimatePresence>
+        {showGames && <GamesCorner onClose={() => setShowGames(false)} />}
+      </AnimatePresence>
 
       {scene !== "entry" && scene !== "art" && <ProgressIndicator currentStep={sceneIndex[scene]} />}
 
