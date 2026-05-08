@@ -42,6 +42,7 @@ const Index = () => {
   const [rainOn, setRainOn] = useState(true);
   const [ambiance, setAmbiance] = useState<"morning" | "evening" | "night">("evening");
   const [soundOn, setSoundOn] = useState(false);
+  const [showGames, setShowGames] = useState(false);
 
 
   // Painting decision state — once set, NEVER re-ask
