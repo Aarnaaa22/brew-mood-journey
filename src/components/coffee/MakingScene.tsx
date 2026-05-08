@@ -124,13 +124,13 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
   }, [foamBlobs, isFoamStep, advanceStep]);
 
   const layerColors: Record<string, string> = {
-    "Insert Grounds": "hsl(20 40% 15%)",
-    "Pull Espresso": "hsl(20 50% 22%)",
-    "Add Chocolate": "hsl(15 40% 25%)",
-    "Add Hot Water": "hsl(30 15% 55%)",
-    "Pour Milk": "hsl(35 30% 82%)",
-    "Add Foam": "hsl(40 25% 90%)",
-    "Whipped Cream": "hsl(40 20% 94%)",
+    "Insert Grounds": "linear-gradient(180deg, hsl(22 45% 18%), hsl(18 50% 9%))",
+    "Pull Espresso": "linear-gradient(180deg, hsl(24 55% 28%), hsl(18 60% 12%))",
+    "Add Chocolate": "linear-gradient(180deg, hsl(16 45% 28%), hsl(14 50% 14%))",
+    "Add Hot Water": "linear-gradient(180deg, hsl(30 18% 58%), hsl(28 20% 40%))",
+    "Pour Milk": "linear-gradient(180deg, hsl(36 35% 86%), hsl(32 28% 70%))",
+    "Add Foam": "linear-gradient(180deg, hsl(40 30% 94%), hsl(36 25% 80%))",
+    "Whipped Cream": "linear-gradient(180deg, hsl(42 28% 96%), hsl(38 22% 84%))",
   };
 
   // Which item is active target
