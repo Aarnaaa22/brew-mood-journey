@@ -272,18 +272,58 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
 
               <div
                 ref={foamCanvasRef}
-                className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-36 h-44 rounded-b-3xl rounded-t-lg border-2 border-coffee-medium/30 bg-coffee-foam/15 overflow-hidden relative ${isFoamStep ? "cursor-crosshair" : ""}`}
+                className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-36 h-44 rounded-b-[2.5rem] rounded-t-md overflow-hidden relative ${isFoamStep ? "cursor-crosshair" : ""}`}
                 onPointerDown={handleFoamPointerDown}
                 onPointerMove={handleFoamPointerMove}
                 onPointerUp={handleFoamPointerUp}
                 onPointerLeave={handleFoamPointerUp}
-                style={{ touchAction: "none" }}
+                style={{
+                  touchAction: "none",
+                  background:
+                    "linear-gradient(180deg, hsl(38 30% 92%) 0%, hsl(35 25% 84%) 45%, hsl(28 22% 70%) 100%)",
+                  border: "1.5px solid hsl(28 35% 28% / 0.55)",
+                  boxShadow:
+                    "inset 0 8px 18px hsl(20 30% 15% / 0.35), inset 0 -10px 20px hsl(20 25% 18% / 0.25), inset 6px 0 14px hsl(40 30% 95% / 0.35), inset -8px 0 14px hsl(20 30% 18% / 0.3), 0 12px 22px hsl(20 30% 12% / 0.35)",
+                }}
               >
-                {/* Cup inner reflection */}
+                {/* Ceramic grain noise */}
+                <div
+                  className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay opacity-40"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(hsl(20 20% 20% / 0.18) 1px, transparent 1px), radial-gradient(hsl(40 30% 95% / 0.15) 1px, transparent 1px)",
+                    backgroundSize: "3px 3px, 5px 5px",
+                    backgroundPosition: "0 0, 1px 2px",
+                  }}
+                />
+                {/* Soft highlight (left side reflection) */}
                 <div
                   className="absolute inset-0 pointer-events-none z-10"
                   style={{
-                    background: "linear-gradient(135deg, hsl(40 30% 90% / 0.1) 0%, transparent 40%, hsl(40 30% 90% / 0.05) 100%)",
+                    background:
+                      "linear-gradient(105deg, hsl(40 35% 98% / 0.45) 0%, hsl(40 30% 95% / 0.15) 18%, transparent 38%, transparent 75%, hsl(20 30% 15% / 0.18) 100%)",
+                  }}
+                />
+                {/* Vintage gold ornamental border (top) */}
+                <div
+                  className="absolute top-2 left-0 right-0 h-[6px] pointer-events-none z-20 opacity-80"
+                  style={{
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, hsl(38 55% 45%) 0px, hsl(40 65% 60%) 2px, hsl(30 45% 30%) 4px, hsl(40 65% 60%) 6px, hsl(38 55% 45%) 8px)",
+                    maskImage:
+                      "radial-gradient(circle at 50% 50%, black 60%, transparent 100%)",
+                  }}
+                />
+                <div
+                  className="absolute top-[14px] left-2 right-2 h-px pointer-events-none z-20"
+                  style={{ background: "hsl(38 55% 40% / 0.6)" }}
+                />
+                {/* Vignette inside cup */}
+                <div
+                  className="absolute inset-0 pointer-events-none z-30"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at 50% 30%, transparent 40%, hsl(20 30% 10% / 0.35) 100%)",
                   }}
                 />
                 {/* Liquid layers */}
