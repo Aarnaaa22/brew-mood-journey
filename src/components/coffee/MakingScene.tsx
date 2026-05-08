@@ -124,13 +124,13 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
   }, [foamBlobs, isFoamStep, advanceStep]);
 
   const layerColors: Record<string, string> = {
-    "Insert Grounds": "hsl(20 40% 15%)",
-    "Pull Espresso": "hsl(20 50% 22%)",
-    "Add Chocolate": "hsl(15 40% 25%)",
-    "Add Hot Water": "hsl(30 15% 55%)",
-    "Pour Milk": "hsl(35 30% 82%)",
-    "Add Foam": "hsl(40 25% 90%)",
-    "Whipped Cream": "hsl(40 20% 94%)",
+    "Insert Grounds": "linear-gradient(180deg, hsl(22 45% 18%), hsl(18 50% 9%))",
+    "Pull Espresso": "linear-gradient(180deg, hsl(24 55% 28%), hsl(18 60% 12%))",
+    "Add Chocolate": "linear-gradient(180deg, hsl(16 45% 28%), hsl(14 50% 14%))",
+    "Add Hot Water": "linear-gradient(180deg, hsl(30 18% 58%), hsl(28 20% 40%))",
+    "Pour Milk": "linear-gradient(180deg, hsl(36 35% 86%), hsl(32 28% 70%))",
+    "Add Foam": "linear-gradient(180deg, hsl(40 30% 94%), hsl(36 25% 80%))",
+    "Whipped Cream": "linear-gradient(180deg, hsl(42 28% 96%), hsl(38 22% 84%))",
   };
 
   // Which item is active target
@@ -272,18 +272,58 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
 
               <div
                 ref={foamCanvasRef}
-                className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-36 h-44 rounded-b-3xl rounded-t-lg border-2 border-coffee-medium/30 bg-coffee-foam/15 overflow-hidden relative ${isFoamStep ? "cursor-crosshair" : ""}`}
+                className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-36 h-44 rounded-b-[2.5rem] rounded-t-md overflow-hidden relative ${isFoamStep ? "cursor-crosshair" : ""}`}
                 onPointerDown={handleFoamPointerDown}
                 onPointerMove={handleFoamPointerMove}
                 onPointerUp={handleFoamPointerUp}
                 onPointerLeave={handleFoamPointerUp}
-                style={{ touchAction: "none" }}
+                style={{
+                  touchAction: "none",
+                  background:
+                    "linear-gradient(180deg, hsl(38 30% 92%) 0%, hsl(35 25% 84%) 45%, hsl(28 22% 70%) 100%)",
+                  border: "1.5px solid hsl(28 35% 28% / 0.55)",
+                  boxShadow:
+                    "inset 0 8px 18px hsl(20 30% 15% / 0.35), inset 0 -10px 20px hsl(20 25% 18% / 0.25), inset 6px 0 14px hsl(40 30% 95% / 0.35), inset -8px 0 14px hsl(20 30% 18% / 0.3), 0 12px 22px hsl(20 30% 12% / 0.35)",
+                }}
               >
-                {/* Cup inner reflection */}
+                {/* Ceramic grain noise */}
+                <div
+                  className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay opacity-40"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(hsl(20 20% 20% / 0.18) 1px, transparent 1px), radial-gradient(hsl(40 30% 95% / 0.15) 1px, transparent 1px)",
+                    backgroundSize: "3px 3px, 5px 5px",
+                    backgroundPosition: "0 0, 1px 2px",
+                  }}
+                />
+                {/* Soft highlight (left side reflection) */}
                 <div
                   className="absolute inset-0 pointer-events-none z-10"
                   style={{
-                    background: "linear-gradient(135deg, hsl(40 30% 90% / 0.1) 0%, transparent 40%, hsl(40 30% 90% / 0.05) 100%)",
+                    background:
+                      "linear-gradient(105deg, hsl(40 35% 98% / 0.45) 0%, hsl(40 30% 95% / 0.15) 18%, transparent 38%, transparent 75%, hsl(20 30% 15% / 0.18) 100%)",
+                  }}
+                />
+                {/* Vintage gold ornamental border (top) */}
+                <div
+                  className="absolute top-2 left-0 right-0 h-[6px] pointer-events-none z-20 opacity-80"
+                  style={{
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, hsl(38 55% 45%) 0px, hsl(40 65% 60%) 2px, hsl(30 45% 30%) 4px, hsl(40 65% 60%) 6px, hsl(38 55% 45%) 8px)",
+                    maskImage:
+                      "radial-gradient(circle at 50% 50%, black 60%, transparent 100%)",
+                  }}
+                />
+                <div
+                  className="absolute top-[14px] left-2 right-2 h-px pointer-events-none z-20"
+                  style={{ background: "hsl(38 55% 40% / 0.6)" }}
+                />
+                {/* Vignette inside cup */}
+                <div
+                  className="absolute inset-0 pointer-events-none z-30"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at 50% 30%, transparent 40%, hsl(20 30% 10% / 0.35) 100%)",
                   }}
                 />
                 {/* Liquid layers */}
@@ -293,16 +333,29 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                   return (
                     <motion.div
                       key={stepIdx}
-                      className="absolute left-0 right-0"
+                      className="absolute left-0 right-0 overflow-hidden"
                       style={{
                         bottom: `${i * layerHeight}%`,
                         height: `${layerHeight}%`,
-                        backgroundColor: color,
+                        background: color,
+                        boxShadow: i === completedSteps.length - 1
+                          ? "inset 0 4px 8px hsl(40 30% 95% / 0.22), inset 0 -3px 8px hsl(20 30% 8% / 0.35)"
+                          : "inset 0 -2px 4px hsl(20 30% 10% / 0.2)",
                       }}
                       initial={{ scaleY: 0 }}
                       animate={{ scaleY: 1 }}
                       transition={{ duration: 0.7, ease: "easeOut" }}
-                    />
+                    >
+                      {i === completedSteps.length - 1 && (
+                        <div
+                          className="absolute top-0 left-0 right-0 h-2 pointer-events-none"
+                          style={{
+                            background:
+                              "linear-gradient(180deg, hsl(40 40% 96% / 0.4), transparent)",
+                          }}
+                        />
+                      )}
+                    </motion.div>
                   );
                 })}
 
@@ -316,7 +369,8 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                       top: `${blob.y}%`,
                       width: blob.size,
                       height: blob.size * 0.7,
-                      background: "radial-gradient(ellipse, hsl(40 30% 95% / 0.95), hsl(40 20% 88% / 0.7))",
+                      background:
+                        "radial-gradient(ellipse at 35% 35%, hsl(42 35% 97% / 0.98), hsl(38 25% 88% / 0.85) 55%, hsl(32 20% 76% / 0.6))",
                       transform: "translate(-50%, -50%)",
                       filter: "blur(1px)",
                     }}
@@ -386,7 +440,26 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                 )}
               </div>
               {/* Handle */}
-              <div className="absolute right-[-14px] top-1/3 w-5 h-12 border-2 border-coffee-medium/30 rounded-r-full" />
+              {/* Vintage ceramic handle */}
+              <div
+                className="absolute right-[-16px] top-[35%] w-6 h-14 rounded-r-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, hsl(35 25% 78%) 0%, hsl(30 22% 68%) 50%, hsl(25 25% 50%) 100%)",
+                  border: "1.5px solid hsl(28 35% 28% / 0.55)",
+                  borderLeft: "none",
+                  boxShadow:
+                    "inset -2px 0 4px hsl(20 30% 12% / 0.35), inset 2px 0 3px hsl(40 35% 95% / 0.4), 2px 3px 6px hsl(20 30% 12% / 0.3)",
+                }}
+              />
+              {/* Soft shadow under cup */}
+              <div
+                className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-40 h-3 rounded-full pointer-events-none"
+                style={{
+                  background: "radial-gradient(ellipse, hsl(20 30% 10% / 0.35), transparent 70%)",
+                  filter: "blur(4px)",
+                }}
+              />
             </motion.div>
           </div>
 
