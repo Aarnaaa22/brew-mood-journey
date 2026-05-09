@@ -320,12 +320,12 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                   className="absolute top-[14px] left-2 right-2 h-px pointer-events-none z-20"
                   style={{ background: "hsl(38 55% 40% / 0.6)" }}
                 />
-                {/* Vignette inside cup */}
+                {/* Vignette inside cup (lighter for transparency) */}
                 <div
                   className="absolute inset-0 pointer-events-none z-30"
                   style={{
                     background:
-                      "radial-gradient(ellipse at 50% 30%, transparent 40%, hsl(20 30% 10% / 0.35) 100%)",
+                      "radial-gradient(ellipse at 50% 30%, transparent 50%, hsl(20 30% 10% / 0.18) 100%)",
                   }}
                 />
                 {/* Liquid layers */}
