@@ -447,11 +447,13 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                 className="absolute right-[-16px] top-[35%] w-6 h-14 rounded-r-full"
                 style={{
                   background:
-                    "linear-gradient(90deg, hsl(35 25% 78%) 0%, hsl(30 22% 68%) 50%, hsl(25 25% 50%) 100%)",
+                    "linear-gradient(90deg, hsl(35 25% 78% / 0.45) 0%, hsl(30 22% 68% / 0.4) 50%, hsl(25 25% 50% / 0.45) 100%)",
                   border: "1.5px solid hsl(28 35% 28% / 0.55)",
                   borderLeft: "none",
+                  backdropFilter: "blur(2px)",
+                  WebkitBackdropFilter: "blur(2px)",
                   boxShadow:
-                    "inset -2px 0 4px hsl(20 30% 12% / 0.35), inset 2px 0 3px hsl(40 35% 95% / 0.4), 2px 3px 6px hsl(20 30% 12% / 0.3)",
+                    "inset -2px 0 4px hsl(20 30% 12% / 0.25), inset 2px 0 3px hsl(40 35% 95% / 0.3), 2px 3px 6px hsl(20 30% 12% / 0.25)",
                 }}
               />
               {/* Soft shadow under cup */}
