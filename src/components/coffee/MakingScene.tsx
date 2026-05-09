@@ -280,10 +280,12 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                 style={{
                   touchAction: "none",
                   background:
-                    "linear-gradient(180deg, hsl(38 30% 92%) 0%, hsl(35 25% 84%) 45%, hsl(28 22% 70%) 100%)",
+                    "linear-gradient(180deg, hsl(38 30% 92% / 0.32) 0%, hsl(35 25% 84% / 0.28) 45%, hsl(28 22% 70% / 0.32) 100%)",
                   border: "1.5px solid hsl(28 35% 28% / 0.55)",
+                  backdropFilter: "blur(2px)",
+                  WebkitBackdropFilter: "blur(2px)",
                   boxShadow:
-                    "inset 0 8px 18px hsl(20 30% 15% / 0.35), inset 0 -10px 20px hsl(20 25% 18% / 0.25), inset 6px 0 14px hsl(40 30% 95% / 0.35), inset -8px 0 14px hsl(20 30% 18% / 0.3), 0 12px 22px hsl(20 30% 12% / 0.35)",
+                    "inset 0 8px 18px hsl(20 30% 15% / 0.18), inset 0 -10px 20px hsl(20 25% 18% / 0.15), inset 6px 0 14px hsl(40 30% 95% / 0.25), inset -8px 0 14px hsl(20 30% 18% / 0.2), 0 12px 22px hsl(20 30% 12% / 0.3)",
                 }}
               >
                 {/* Ceramic grain noise */}
