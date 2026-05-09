@@ -280,10 +280,12 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                 style={{
                   touchAction: "none",
                   background:
-                    "linear-gradient(180deg, hsl(38 30% 92%) 0%, hsl(35 25% 84%) 45%, hsl(28 22% 70%) 100%)",
+                    "linear-gradient(180deg, hsl(38 30% 92% / 0.32) 0%, hsl(35 25% 84% / 0.28) 45%, hsl(28 22% 70% / 0.32) 100%)",
                   border: "1.5px solid hsl(28 35% 28% / 0.55)",
+                  backdropFilter: "blur(2px)",
+                  WebkitBackdropFilter: "blur(2px)",
                   boxShadow:
-                    "inset 0 8px 18px hsl(20 30% 15% / 0.35), inset 0 -10px 20px hsl(20 25% 18% / 0.25), inset 6px 0 14px hsl(40 30% 95% / 0.35), inset -8px 0 14px hsl(20 30% 18% / 0.3), 0 12px 22px hsl(20 30% 12% / 0.35)",
+                    "inset 0 8px 18px hsl(20 30% 15% / 0.18), inset 0 -10px 20px hsl(20 25% 18% / 0.15), inset 6px 0 14px hsl(40 30% 95% / 0.25), inset -8px 0 14px hsl(20 30% 18% / 0.2), 0 12px 22px hsl(20 30% 12% / 0.3)",
                 }}
               >
                 {/* Ceramic grain noise */}
@@ -318,12 +320,12 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                   className="absolute top-[14px] left-2 right-2 h-px pointer-events-none z-20"
                   style={{ background: "hsl(38 55% 40% / 0.6)" }}
                 />
-                {/* Vignette inside cup */}
+                {/* Vignette inside cup (lighter for transparency) */}
                 <div
                   className="absolute inset-0 pointer-events-none z-30"
                   style={{
                     background:
-                      "radial-gradient(ellipse at 50% 30%, transparent 40%, hsl(20 30% 10% / 0.35) 100%)",
+                      "radial-gradient(ellipse at 50% 30%, transparent 50%, hsl(20 30% 10% / 0.18) 100%)",
                   }}
                 />
                 {/* Liquid layers */}
@@ -445,11 +447,13 @@ const MakingScene = ({ coffee, onComplete }: MakingSceneProps) => {
                 className="absolute right-[-16px] top-[35%] w-6 h-14 rounded-r-full"
                 style={{
                   background:
-                    "linear-gradient(90deg, hsl(35 25% 78%) 0%, hsl(30 22% 68%) 50%, hsl(25 25% 50%) 100%)",
+                    "linear-gradient(90deg, hsl(35 25% 78% / 0.45) 0%, hsl(30 22% 68% / 0.4) 50%, hsl(25 25% 50% / 0.45) 100%)",
                   border: "1.5px solid hsl(28 35% 28% / 0.55)",
                   borderLeft: "none",
+                  backdropFilter: "blur(2px)",
+                  WebkitBackdropFilter: "blur(2px)",
                   boxShadow:
-                    "inset -2px 0 4px hsl(20 30% 12% / 0.35), inset 2px 0 3px hsl(40 35% 95% / 0.4), 2px 3px 6px hsl(20 30% 12% / 0.3)",
+                    "inset -2px 0 4px hsl(20 30% 12% / 0.25), inset 2px 0 3px hsl(40 35% 95% / 0.3), 2px 3px 6px hsl(20 30% 12% / 0.25)",
                 }}
               />
               {/* Soft shadow under cup */}
